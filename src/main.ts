@@ -249,13 +249,13 @@ class ConfirmModal extends Modal {
       .addButton(btn => btn.setButtonText(tr(this.settings, 'apply')).setCta().onClick(async () => {
         this.close();
         try { await this.onConfirm(); }
-        catch (err) { console.error('Linker4Obsidian: conversion failed', err); new Notice(tr(this.settings, 'modalError')); }
+        catch (err) { console.error('Linker: conversion failed', err); new Notice(tr(this.settings, 'modalError')); }
       }));
   }
   onClose(): void { this.contentEl.empty(); }
 }
 
-export default class Linker4ObsidianPlugin extends Plugin {
+export default class LinkerPlugin extends Plugin {
   settings: LinkerSettings = DEFAULT_SETTINGS;
   private applying = new WeakSet<EditorView>();
 
@@ -429,7 +429,7 @@ export default class Linker4ObsidianPlugin extends Plugin {
                   });
                   changed += fileChanges;
                 }
-              } catch (e) { errors++; console.error('Linker4Obsidian: failed on', file.path, e); }
+              } catch (e) { errors++; console.error('Linker: failed on', file.path, e); }
             }
             new Notice(tr(this.settings, 'vaultApplied', { count: changed, errors: errors ? tr(this.settings, 'vaultErrors', { count: errors }) : '' }), 8000);
           }).open();
@@ -441,12 +441,12 @@ export default class Linker4ObsidianPlugin extends Plugin {
 
 class LinkerSettingTab extends PluginSettingTab {
   private activeSection: 'general' | 'external' = 'general';
-  constructor(app: App, private plugin: Linker4ObsidianPlugin) { super(app, plugin); }
+  constructor(app: App, private plugin: LinkerPlugin) { super(app, plugin); }
   display(): void {
     const { containerEl } = this;
     const t = (key: TranslationKey) => tr(this.plugin.settings, key);
     containerEl.empty();
-    containerEl.createEl('h2', { text: 'Linker4Obsidian' });
+    containerEl.createEl('h2', { text: 'Linker' });
     // Separate settings pages while preserving support for Obsidian 1.8.7+.
     new Setting(containerEl)
       .addButton(btn => {

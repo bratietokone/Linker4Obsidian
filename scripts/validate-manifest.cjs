@@ -1,0 +1,15 @@
+'use strict';
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+assert.match(manifest.id, /^[a-z]+(?:-[a-z]+)*$/, 'ID must contain only lowercase letters and hyphens');
+assert.ok(!manifest.id.includes('obsidian') && !manifest.id.endsWith('plugin'), 'Invalid plugin ID');
+assert.match(manifest.name, /^[a-zA-Z0-9 ()+\-]+$/, 'Invalid display name');
+assert.ok(!/obsidian|obsi-|\-sidian|plugin/i.test(manifest.name), 'Invalid plugin name');
+assert.match(manifest.version, /^\d+\.\d+\.\d+$/, 'Version must be x.y.z');
+assert.equal(manifest.version, pkg.version, 'Versions in manifest and package must match');
+assert.equal(manifest.isDesktopOnly, true, 'Node/Electron APIs require desktop-only');
+assert.ok(manifest.description.length <= 250 && manifest.description.endsWith('.'), 'Description must be short and end in a period');
+assert.ok(manifest.minAppVersion && manifest.author, 'Missing required manifest fields');
+console.log('Obsidian manifest validation passed.');

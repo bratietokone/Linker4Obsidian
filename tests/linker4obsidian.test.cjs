@@ -93,8 +93,8 @@ const tests = [
   () => assert.equal(__test.localeFromLanguage('zh-Hans'), 'zh-CN'),
   () => assert.equal(__test.localeFromLanguage('zh-TW'), 'en'),
   () => assert.equal(__test.localeFromLanguage('de-DE'), 'en'),
-  () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'applied', { count: 3 }), 'Linker4Obsidian: применено 3 изменений.'),
-  () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'applied', { count: 3 }), 'Linker4Obsidian: applied 3 changes.')
+  () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'applied', { count: 3 }), 'Linker: применено 3 изменений.'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'applied', { count: 3 }), 'Linker: applied 3 changes.')
 ];
 for (let i = 0; i < tests.length; i++) {
   try { tests[i](); }

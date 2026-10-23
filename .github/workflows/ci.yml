@@ -13,15 +13,18 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-audit --no-fund
+      - run: npm run validate
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - name: Verify committed build matches source
+        run: git diff --exit-code -- main.js
       - name: Package test build
         run: |
-          mkdir -p dist/linker4obsidian
-          cp main.js manifest.json dist/linker4obsidian/
+          mkdir -p dist/linker
+          cp main.js manifest.json dist/linker/
       - uses: actions/upload-artifact@v4
         with:
-          name: linker4obsidian-test-build
+          name: linker-test-build
           path: dist/
           if-no-files-found: error

@@ -1,10 +1,10 @@
-# Linker4Obsidian
+# Linker
 
 **文档语言：** [English](README.md) | [Русский](README.ru.md) | [Español](README.es.md) | [简体中文](README.zh-CN.md)
 
-Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。它让 Markdown 笔记保持为普通 Wiki 链接，同时根据规则自动嵌入受支持的附件；还可以将单独的 YouTube 视频网址转换为嵌入式播放器。
+Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。它让 Markdown 笔记保持为普通 Wiki 链接，同时根据规则自动嵌入受支持的附件；还可以将单独的 YouTube 视频网址转换为嵌入式播放器。
 
-**版本：** 0.4.0 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
+**版本：** 0.5.0 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
 
 ## 功能
 
@@ -17,39 +17,43 @@ Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区
 
 - **外部文件与文件夹：** 创建 Markdown `file:///` 或 Wiki `[[external:...]]` 链接，无需将文件复制进笔记库。
 
+> **从 Linker4Obsidian 0.4.0 或更早版本迁移：**插件 ID 从 `linker4obsidian` 改为 `linker`。禁用旧插件，把 Linker 0.5.0 或更高版本安装在 `.obsidian/plugins/linker/`；如需保留设置，可复制原来的 `data.json`。确认新版本正常运行后再删除旧文件夹。
+
+**文件系统访问与隐私：**外部链接功能仅供桌面端使用。用户选择或点击外部文件或文件夹链接时，插件通过 Node.js 检查指定本地路径的元数据，并通过 Electron 请求操作系统打开或显示该对象。访问笔记库外路径仅用于此功能。插件不会读取或上传外部文件内容，也不会上传笔记或收集遥测数据。
+
 ## 安装（Windows、macOS 和 Linux）
 
 > 初次使用或批量转换之前，请备份笔记库，或先在测试库中试用。
 
-1. 打开 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases)。私有仓库需要访问权限。从 **Assets** 下载 `main.js` 和 `manifest.json`，或下载 `linker4obsidian-vX.Y.Z.zip`。
-2. 找到 **Obsidian 笔记库目录**（不是应用安装目录）。在库中创建或打开 `.obsidian/plugins/linker4obsidian/`。
-3. 将 `main.js` 和 `manifest.json` 放入其中。ZIP 已包含 `linker4obsidian/` 目录，应直接解压到 `.obsidian/plugins/`。
+1. 打开 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases)。私有仓库需要访问权限。从 **Assets** 下载 `main.js` 和 `manifest.json`，或下载 `linker-vX.Y.Z.zip`。
+2. 找到 **Obsidian 笔记库目录**（不是应用安装目录）。在库中创建或打开 `.obsidian/plugins/linker/`。
+3. 将 `main.js` 和 `manifest.json` 放入其中。ZIP 已包含 `linker/` 目录，应直接解压到 `.obsidian/plugins/`。
 
    ```text
    YourVault/
    └── .obsidian/
        └── plugins/
-           └── linker4obsidian/
+           └── linker/
                ├── main.js
                └── manifest.json
    ```
 
-4. 重启 Obsidian 或重新加载社区插件。在 **设置 → 第三方插件（Community plugins）** 中启用 **Linker4Obsidian**。
+4. 重启 Obsidian 或重新加载社区插件。在 **设置 → 第三方插件（Community plugins）** 中启用 **Linker**。
 5. 打开插件设置，选择语言和链接规则。
 
 ### 显示隐藏文件夹
 
 | 系统 | 示例路径 | 显示隐藏文件 |
 | --- | --- | --- |
-| Windows | `C:\\Users\\<用户名>\\Documents\\MyVault\\.obsidian\\plugins\\linker4obsidian\\` | 文件资源管理器：查看 → 显示 → 隐藏的项目。 |
-| macOS | `/Users/<用户名>/Documents/MyVault/.obsidian/plugins/linker4obsidian/` | Finder：**Cmd+Shift+.** |
-| Linux | `/home/<用户名>/Documents/MyVault/.obsidian/plugins/linker4obsidian/` | 文件管理器：**Ctrl+H**。 |
+| Windows | `C:\\Users\\<用户名>\\Documents\\MyVault\\.obsidian\\plugins\\linker\\` | 文件资源管理器：查看 → 显示 → 隐藏的项目。 |
+| macOS | `/Users/<用户名>/Documents/MyVault/.obsidian/plugins/linker/` | Finder：**Cmd+Shift+.** |
+| Linux | `/home/<用户名>/Documents/MyVault/.obsidian/plugins/linker/` | 文件管理器：**Ctrl+H**。 |
 
-以上仅为示例，笔记库可以放在任何位置。请勿多创建一层 `linker4obsidian/linker4obsidian/`。
+以上仅为示例，笔记库可以放在任何位置。请勿多创建一层 `linker/linker/`。
 
 ## 界面语言
 
-在 **设置 → Linker4Obsidian → 界面语言** 中选择 **自动**、**English**、**Русский**、**Español** 或 **简体中文**。自动模式会跟随受支持的 Obsidian 界面语言，其他语言使用英语作为默认回退。
+在 **设置 → Linker → 界面语言** 中选择 **自动**、**English**、**Русский**、**Español** 或 **简体中文**。自动模式会跟随受支持的 Obsidian 界面语言，其他语言使用英语作为默认回退。
 
 切换后设置、通知及对话框立即更新，命令面板中的名称需要重新加载插件才能更新。
 
@@ -70,7 +74,7 @@ Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区
 
 ## 外部文件与文件夹
 
-在 **设置 → Linker4Obsidian → 外部文件与文件夹** 中，有独立的设置页面。可以启用外部链接，并选择新链接使用 Markdown 或 Wiki 格式；两种格式均可打开。
+在 **设置 → Linker → 外部文件与文件夹** 中，有独立的设置页面。可以启用外部链接，并选择新链接使用 Markdown 或 Wiki 格式；两种格式均可打开。
 
 ```markdown
 [项目](<file:///home/user/Projects/>)

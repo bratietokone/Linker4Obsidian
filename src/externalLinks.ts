@@ -96,7 +96,7 @@ export async function openExternalTarget(target: string, mode: ExternalOpenMode,
       if (error) throw new Error(error);
     }
   } catch (error) {
-    console.error('Linker4Obsidian: cannot open external file', error);
+    console.error('Linker: cannot open external file', error);
     new Notice(t('externalOpenFailed'));
   }
 }
@@ -118,7 +118,7 @@ async function chooseNativePath(kind: ExternalKind): Promise<string | null> {
     });
     return result.canceled ? null : (result.filePaths[0] || null);
   } catch (error) {
-    console.error('Linker4Obsidian: native picker failed', error);
+    console.error('Linker: native picker failed', error);
     return null;
   }
 }

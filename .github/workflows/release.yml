@@ -39,6 +39,8 @@ jobs:
         run: npm run build
       - name: Test
         run: npm test
+      - name: Verify committed build matches source
+        run: git diff --exit-code -- main.js
       - name: Prepare assets and release notes
         shell: bash
         run: |

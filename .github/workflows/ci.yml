@@ -17,6 +17,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - name: Verify committed build matches source
+        run: git diff --exit-code -- main.js
       - name: Package test build
         run: |
           mkdir -p dist/linker

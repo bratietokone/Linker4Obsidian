@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - '*.*.*'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -27,8 +28,12 @@ jobs:
           VERSION="$(node -p "require('./manifest.json').version")"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
           test "$VERSION" = "$PACKAGE_VERSION"
-          test "$VERSION" = "$GITHUB_REF_NAME"
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            test "$GITHUB_REF" = "refs/heads/main"
+          else
+            test "$VERSION" = "$GITHUB_REF_NAME"
+          fi
       - name: Install dependencies
         run: npm install --no-audit --no-fund
       - name: Validate plugin manifest
@@ -60,7 +65,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          TAG="$GITHUB_REF_NAME"
+          TAG="$(node -p "require('./manifest.json').version")"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            # The workflow runs only on main. Create a lightweight tag after
+            # validation, typechecking, build, and tests have passed.
+            EXISTING_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha' 2>/dev/null || true)"
+            if [[ -n "$EXISTING_SHA" && "$EXISTING_SHA" != "$GITHUB_SHA" ]]; then
+              echo "::error::Tag $TAG points to $EXISTING_SHA, not $GITHUB_SHA"
+              exit 1
+            fi
+            if [[ -z "$EXISTING_SHA" ]]; then
+              gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+                -f "ref=refs/tags/${TAG}" \
+                -f "sha=${GITHUB_SHA}" >/dev/null
+            fi
+          fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             echo "Release $TAG already exists; no overwrite."
             exit 0

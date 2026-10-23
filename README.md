@@ -108,7 +108,6 @@ GitHub Actions runs the same checks on pushes and pull requests. The plugin uses
 
 - [Releases](https://github.com/bratietokone/Linker4Obsidian/releases)
 - [Changelog](CHANGELOG.md)
-
 - [Repository](https://github.com/bratietokone/Linker4Obsidian)
 - [Report a bug or request a feature](https://github.com/bratietokone/Linker4Obsidian/issues)
 - [License](LICENSE)

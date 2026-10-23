@@ -107,8 +107,7 @@ GitHub Actions запускает эти проверки при обновле�
 ## Обратная связь и лицензия
 
 - [Релизы](https://github.com/bratietokone/Linker4Obsidian/releases)
-- [История изменений](CHANGELOG.md)
-
+- [История изменений](CHANGELOG.ru.md)
 - [Репозиторий](https://github.com/bratietokone/Linker4Obsidian)
 - [Сообщить об ошибке или предложить улучшение](https://github.com/bratietokone/Linker4Obsidian/issues)
 - [Лицензия](LICENSE)

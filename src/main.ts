@@ -414,7 +414,7 @@ class LinkerSettingTab extends PluginSettingTab {
         es: t('languageSpanish'), 'zh-CN': t('languageChinese')
       }).setValue(this.plugin.settings.language).onChange(async (value) => {
         if (!['auto', 'en', 'ru', 'es', 'zh-CN'].includes(value)) return;
-        this.plugin.settings.language = value;
+        this.plugin.settings.language = value as LanguagePreference;
         await this.plugin.saveSettings();
         this.display();
         new Notice(tr(this.plugin.settings, 'languageChanged'));

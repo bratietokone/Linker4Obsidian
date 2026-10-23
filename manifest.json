@@ -1,9 +1,9 @@
 {
-  "id": "linker4obsidian",
-  "name": "Linker4Obsidian",
-  "version": "0.4.0",
+  "id": "linker-four",
+  "name": "Linker4",
+  "version": "0.5.0",
   "minAppVersion": "1.8.7",
-  "description": "Smart wiki links for Markdown and attachments, plus automatic YouTube embeds and safe bulk conversion.",
+  "description": "Manage Wiki-links and embedded attachments, embed YouTube videos, and link to external files and folders.",
   "author": "bratietokone",
   "isDesktopOnly": true
 }

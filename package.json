@@ -1,12 +1,13 @@
 {
-  "name": "linker4obsidian",
-  "version": "0.4.0",
+  "name": "linker4",
+  "version": "0.5.0",
   "private": true,
   "type": "commonjs",
   "scripts": {
     "build": "node scripts/build.cjs",
     "test": "node tests/linker4obsidian.test.cjs && node tests/integration.test.cjs && node tests/external-links.test.cjs",
-    "typecheck": "tsc --noEmit --skipLibCheck -p tsconfig.json"
+    "typecheck": "tsc --noEmit --skipLibCheck -p tsconfig.json",
+    "validate": "node scripts/validate-manifest.cjs"
   },
   "devDependencies": {
     "obsidian": "^1.14.4",

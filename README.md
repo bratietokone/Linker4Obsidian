@@ -120,7 +120,7 @@ The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite 
 
 ## Development
 
-Requires Node.js and npm. Source files are in `src/`, translations in `src/locales/`; the built `main.js` and `manifest.json` are in the repository root.
+Requires Node.js and npm. Source files are in `src/`, translations in `src/locales/`; `manifest.json` is in the repository root; `npm run build` generates `main.js` locally (not tracked in Git).
 
 ```bash
 npm ci
@@ -134,7 +134,7 @@ GitHub Actions runs the same checks on pushes and pull requests. The plugin uses
 
 ## Publishing a new version
 
-To publish a new version, update `manifest.json` and `package.json` to the same new `X.Y.Z` version, and add the corresponding `## [X.Y.Z]` entry to `CHANGELOG.md`. If the source changes, rebuild and commit `main.js`. Merge or commit these changes to `main` together. The [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) workflow automatically validates, builds, tests and publishes the GitHub Release with the tag `X.Y.Z` (without `v`). If any check fails, publication is blocked. Do not create the tag or publish a draft manually. To retry a failed release after fixing the cause, use **Run workflow** on `main`. Already published versions are not overwritten.
+To publish a new version, update `manifest.json` and `package.json` to the same new `X.Y.Z` version, and add the corresponding `## [X.Y.Z]` entry to `CHANGELOG.md`. Commit the source and version metadata to `main` together; GitHub Actions builds `main.js` automatically and attaches it to the release. Do not commit the generated file. The [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) workflow automatically validates, builds, tests and publishes the GitHub Release with the tag `X.Y.Z` (without `v`). If any check fails, publication is blocked. Do not create the tag or publish a draft manually. To retry a failed release after fixing the cause, use **Run workflow** on `main`. Already published versions are not overwritten.
 
 ## Feedback and license
 

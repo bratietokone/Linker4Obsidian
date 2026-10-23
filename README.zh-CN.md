@@ -109,11 +109,12 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
 
 ## 开发
 
-需要 Node.js 和 npm。TypeScript 源码位于 `src/`，本地化文件位于 `src/locales/`，使用 esbuild 打包成单个 `main.js`。
+需要 Node.js 和 npm。TypeScript 源码位于 `src/`，本地化文件位于 `src/locales/`，使用 esbuild 在构建时生成 `main.js`；该文件不提交至 Git，而是由 GitHub Actions 自动附加到 Release。
 
 ```bash
 npm ci
 npm run typecheck
+npm run lint
 npm run build
 npm test
 ```
@@ -122,7 +123,7 @@ GitHub Actions 会执行相同的检查。
 
 ## 发布新版本
 
-将 `manifest.json` 和 `package.json` 中的版本号同时更新为新的 `X.Y.Z`，并在 `CHANGELOG.md` 添加对应的 `## [X.Y.Z]` 章节。如果源代码有变化，请重新构建并提交 `main.js`。将所有修改合并到 `main`。工作流 [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) 会自动验证、构建、运行测试，并使用 `X.Y.Z`（不带 `v` 前缀）标签发布 GitHub Release。任何检查失败都将阻止发布，无需手动创建标签或发布草稿。修复问题后，可在 `main` 分支点击 **Run workflow** 重试。已发布的版本不会被覆盖。
+将 `manifest.json` 和 `package.json` 中的版本号同时更新为新的 `X.Y.Z`，并在 `CHANGELOG.md` 添加对应的 `## [X.Y.Z]` 章节。将源代码和版本元数据的变更合并到 `main`；GitHub Actions 会自动构建 `main.js` 并将其作为 Release 附件，无需把生成文件提交到 Git。工作流 [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) 会自动验证、构建、运行测试，并使用 `X.Y.Z`（不带 `v` 前缀）标签发布 GitHub Release。任何检查失败都将阻止发布，无需手动创建标签或发布草稿。修复问题后，可在 `main` 分支点击 **Run workflow** 重试。已发布的版本不会被覆盖。
 
 ## 相关链接
 

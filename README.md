@@ -131,6 +131,10 @@ npm test
 
 GitHub Actions runs the same checks on pushes and pull requests. The plugin uses TypeScript and Obsidian's editor API; no external runtime packages or network requests are required.
 
+## Publishing a new version
+
+To publish a new version, update `manifest.json` and `package.json` to the same new `X.Y.Z` version, and add the corresponding `## [X.Y.Z]` entry to `CHANGELOG.md`. If the source changes, rebuild and commit `main.js`. Merge or commit these changes to `main` together. The [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) workflow automatically validates, builds, tests and publishes the GitHub Release with the tag `X.Y.Z` (without `v`). If any check fails, publication is blocked. Do not create the tag or publish a draft manually. To retry a failed release after fixing the cause, use **Run workflow** on `main`. Already published versions are not overwritten.
+
 ## Feedback and license
 
 - [Releases](https://github.com/bratietokone/Linker4Obsidian/releases)

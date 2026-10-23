@@ -120,6 +120,10 @@ npm test
 
 GitHub Actions ejecuta las mismas comprobaciones.
 
+## Publicar una versión nueva
+
+Actualiza `manifest.json` y `package.json` a la misma versión nueva `X.Y.Z` y añade la sección `## [X.Y.Z]` a `CHANGELOG.md`. Si cambió el código, reconstruye y confirma `main.js`. Integra todo en `main`. El flujo [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) valida, compila, ejecuta las pruebas y publica automáticamente la versión de GitHub con la etiqueta `X.Y.Z` (sin `v`). Si falla alguna comprobación, no publica nada. No es necesario crear etiquetas ni publicar borradores manualmente. Puedes reintentarlo con **Run workflow** en `main`. Las versiones publicadas no se sobrescriben.
+
 ## Enlaces
 
 - [Releases](https://github.com/bratietokone/Linker4Obsidian/releases)

@@ -4,6 +4,10 @@
 
 Principales cambios de Linker4Obsidian.
 
+## [Sin publicar]
+
+- En desarrollo: enlaces a archivos y carpetas externos en formatos Markdown (`file:///`) y Wiki (`external:`), con página de configuración y comandos propios.
+
 ## [0.3.0] - 2026-10-23
 
 - Se añadieron español y chino simplificado al selector de idiomas y a la detección automática.

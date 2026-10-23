@@ -4,6 +4,10 @@
 
 All notable changes to Linker4Obsidian are documented here.
 
+## [Unreleased]
+
+- In development: external file and folder links in Markdown (`file:///`) and Wiki (`external:`) formats, with a separate settings page and new insert commands.
+
 ## [0.3.0] - 2026-10-23
 
 - Added Spanish and Simplified Chinese interface translations and automatic locale detection.

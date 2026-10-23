@@ -50,7 +50,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          VERSION="$GITHUB_REF_NAME"
+          VERSION="$(node -p "require('./manifest.json').version")"
           awk -v header="## [$VERSION]" '
             /^## \[/ { if (found) exit; if (index($0, header) == 1) { found=1; next } }
             found { print }

@@ -19,6 +19,8 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 
 > **Migrating from Linker4Obsidian 0.4.0 or earlier:** the plugin ID changed from `linker4obsidian` to `linker-four`. Disable the old plugin, install Linker4 0.5.0 or later into `.obsidian/plugins/linker-four/`, and copy the old `data.json` if you want to preserve settings. Verify the new installation before deleting the old plugin folder. Older release packages use a different ID.
 
+**Filesystem access and privacy:** The desktop-only external-link feature uses Node.js filesystem metadata checks to verify the local path selected or clicked by the user. It then asks Electron to open or reveal that file or directory using the operating system. Access outside the vault is needed only for this feature; the plugin does not read or upload external file contents, transmit vault data, or collect telemetry.
+
 ## Installation (Windows, macOS, Linux)
 
 > Before a first installation or any bulk conversion, make a backup of your vault or test the plugin in a separate vault.

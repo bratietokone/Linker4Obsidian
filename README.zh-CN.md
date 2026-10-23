@@ -19,6 +19,8 @@ Linker4 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件�
 
 > **从 Linker4Obsidian 0.4.0 或更早版本迁移：**插件 ID 从 `linker4obsidian` 改为 `linker-four`。禁用旧插件，把 Linker4 0.5.0 或更高版本安装在 `.obsidian/plugins/linker-four/`；如需保留设置，可复制原来的 `data.json`。确认新版本正常运行后再删除旧文件夹。
 
+**文件系统访问与隐私：**外部链接功能仅供桌面端使用。用户选择或点击外部文件或文件夹链接时，插件通过 Node.js 检查指定本地路径的元数据，并通过 Electron 请求操作系统打开或显示该对象。访问笔记库外路径仅用于此功能。插件不会读取或上传外部文件内容，也不会上传笔记或收集遥测数据。
+
 ## 安装（Windows、macOS 和 Linux）
 
 > 初次使用或批量转换之前，请备份笔记库，或先在测试库中试用。

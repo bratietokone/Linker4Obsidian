@@ -19,6 +19,8 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 
 > **Migración desde Linker4Obsidian 0.4.0 o anterior:** el ID ha cambiado de `linker4obsidian` a `linker-four`. Desactiva el plugin anterior, instala Linker4 0.5.0 o posterior en `.obsidian/plugins/linker-four/` y copia el antiguo `data.json` si deseas conservar los ajustes. Comprueba la instalación antes de eliminar la carpeta anterior.
 
+**Acceso al sistema de archivos y privacidad:** la función de enlaces externos (solo escritorio) consulta mediante Node.js los metadatos de la ruta local que el usuario elige o abre, y emplea Electron para abrir o mostrar el archivo o carpeta. Ese acceso fuera de la bóveda solo se necesita para esta función. El plugin no lee ni transmite el contenido de archivos externos, no envía notas y no recopila telemetría.
+
 ## Instalación (Windows, macOS y Linux)
 
 > Antes de realizar conversiones masivas, haz una copia de seguridad de la bóveda o utiliza una bóveda de prueba.

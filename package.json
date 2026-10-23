@@ -1,0 +1,16 @@
+{
+  "name": "linker4obsidian",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "node scripts/build.cjs",
+    "test": "node tests/smart-embed.test.cjs && node tests/integration.test.cjs",
+    "typecheck": "tsc --noEmit --skipLibCheck -p tsconfig.json"
+  },
+  "devDependencies": {
+    "obsidian": "^1.14.4",
+    "@codemirror/view": "^6.38.0",
+    "typescript": "5.8.3"
+  }
+}

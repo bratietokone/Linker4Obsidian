@@ -1,0 +1,74 @@
+'use strict';
+const assert = require('node:assert/strict');
+const Module = require('node:module');
+const { execFileSync } = require('node:child_process');
+const path = require('node:path');
+execFileSync('node', [path.join(__dirname, '..', 'scripts', 'build.cjs')], { stdio: 'inherit' });
+const load = Module._load;
+Module._load = function(request, parent, isMain) {
+  if (request === 'obsidian') return { App: class {}, Editor: class {}, MarkdownView: class {}, Modal: class {}, Notice: class {}, Plugin: class {}, PluginSettingTab: class {}, Setting: class {}, TFile: class {} };
+  if (request === '@codemirror/view') return { EditorView: class {} };
+  return load.call(this, request, parent, isMain);
+};
+const { __test } = require('../main.js');
+Module._load = load;
+const defaults = {
+  automaticWiki: true, automaticYouTube: true, pasteYouTube: true,
+  rules: { markdown: 'link', image: 'embed', pdf: 'embed', video: 'embed', audio: 'embed', other: 'link' },
+  additionalEmbedExtensions: '', additionalLinkExtensions: ''
+};
+const app = { metadataCache: { getFirstLinkpathDest: target => {
+  if (target === 'Notes/My note') return {extension:'md'};
+  if (target === 'pic') return {extension:'png'};
+  return null;
+}}};
+const transform = (text, s = defaults, touch) => __test.transformText(text, 'Inbox/test.md', app, s, touch);
+function eq(input, expected, s = defaults, touch) {
+  const outcome = transform(input, s, touch);
+  assert.equal(outcome.text, expected, '\nInput: ' + JSON.stringify(input));
+  return outcome;
+}
+const tests = [
+  () => eq('[[Notes/My note]]', '[[Notes/My note]]'),
+  () => eq('[[note.md|Name]]', '[[note.md|Name]]'),
+  () => eq('[[pic]]', '![[pic]]'),
+  () => eq('[[Images/photo.webp|400]]', '![[Images/photo.webp|400]]'),
+  () => eq('[[file.pdf#page=12]]', '![[file.pdf#page=12]]'),
+  () => eq('[[foo.mp4]]\n[[a.mp3]]\n[[x.zip]]', '![[foo.mp4]]\n![[a.mp3]]\n[[x.zip]]'),
+  () => eq('![[file.pdf]]', '![[file.pdf]]'),
+  () => eq('![[note.md]]', '![[note.md]]'), // intentional embed preserved
+  () => eq('hello [[image.png]] there', 'hello ![[image.png]] there'),
+  () => eq('`[[image.png]]`', '`[[image.png]]`'),
+  () => eq('before `hello` [[image.png]]', 'before `hello` ![[image.png]]'),
+  () => eq('\\[[image.png]]', '\\[[image.png]]'),
+  () => eq('---\ntitle: "[[image.png]]"\n---\n[[x.pdf]]', '---\ntitle: "[[image.png]]"\n---\n![[x.pdf]]'),
+  () => eq('```md\n[[x.pdf]]\n```\n[[x.pdf]]', '```md\n[[x.pdf]]\n```\n![[x.pdf]]'),
+  () => eq('~~~~\n[[x.pdf]]\n~~~~\n[[x.pdf]]', '~~~~\n[[x.pdf]]\n~~~~\n![[x.pdf]]'),
+  () => eq('<!-- [[x.pdf]] -->\n[[x.pdf]]', '<!-- [[x.pdf]] -->\n![[x.pdf]]'),
+  () => eq('start <!--\n[[x.pdf]]\n-->\n[[x.pdf]]', 'start <!--\n[[x.pdf]]\n-->\n![[x.pdf]]'),
+  () => eq('[[x.pdf]]\r\n[[n.md]]\r\n', '![[x.pdf]]\r\n[[n.md]]\r\n'),
+  () => eq('[[foo.epub]]', '![[foo.epub]]', {...defaults, additionalEmbedExtensions: 'epub'}),
+  () => eq('[[foo.pdf]]', '[[foo.pdf]]', {...defaults, additionalLinkExtensions: 'pdf'}),
+  () => eq('[[foo.pdf]]', '[[foo.pdf]]', {...defaults, rules: {...defaults.rules, pdf:'link'}}),
+  () => eq('[[a.png]] and [[b.pdf]]', '[[a.png]] and ![[b.pdf]]', defaults, {from: 18, to: 19}),
+  () => eq('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'),
+  () => eq('https://youtu.be/dQw4w9WgXcQ', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'),
+  () => eq('https://www.youtube.com/shorts/dQw4w9WgXcQ', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'),
+  () => eq('[Video](https://www.youtube.com/watch?v=dQw4w9WgXcQ)', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'),
+  () => eq('Here is https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'Here is https://www.youtube.com/watch?v=dQw4w9WgXcQ'),
+  () => eq('https://notyoutube.com/watch?v=dQw4w9WgXcQ', 'https://notyoutube.com/watch?v=dQw4w9WgXcQ'),
+  () => eq('https://www.youtube.com/watch?v=BAD', 'https://www.youtube.com/watch?v=BAD'),
+  () => eq('![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)'),
+  () => eq('```\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n```', '```\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n```'),
+  () => eq('[[a.jpg]]', '[[a.jpg]]', {...defaults, automaticWiki: false}),
+  () => eq('https://youtu.be/dQw4w9WgXcQ', 'https://youtu.be/dQw4w9WgXcQ', {...defaults, automaticYouTube: false}),
+  () => assert.equal(__test.youtubeEmbed('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12'), '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12)'),
+  () => assert.equal(__test.youtubeEmbed('https://youtube.com.evil.tld/watch?v=dQw4w9WgXcQ'), null),
+  () => assert.equal(__test.youtubeEmbed('javascript:alert(1)'), null),
+  () => assert.equal(__test.inInlineCode('prefix `code` after', 14), false)
+];
+for (let i = 0; i < tests.length; i++) {
+  try { tests[i](); }
+  catch (error) { console.error(`FAIL ${i+1}`, error); process.exitCode = 1; }
+}
+if (!process.exitCode) console.log(`${tests.length} tests passed.`);

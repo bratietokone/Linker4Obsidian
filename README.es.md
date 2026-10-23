@@ -4,7 +4,7 @@
 
 Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian.md/). Mantiene los enlaces a notas Markdown como enlaces Wiki normales e incrusta automáticamente los archivos adjuntos compatibles. También convierte URL de vídeos de YouTube en reproductores integrados.
 
-**Versión:** 0.5.0 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
+**Versión:** 0.5.1 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
 
 ## Funciones
 

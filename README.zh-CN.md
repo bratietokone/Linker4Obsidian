@@ -4,7 +4,7 @@
 
 Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。它让 Markdown 笔记保持为普通 Wiki 链接，同时根据规则自动嵌入受支持的附件；还可以将单独的 YouTube 视频网址转换为嵌入式播放器。
 
-**版本：** 0.5.0 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
+**版本：** 0.5.1 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
 
 ## 功能
 

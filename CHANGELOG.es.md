@@ -4,6 +4,14 @@
 
 Principales cambios de Linker4Obsidian.
 
+## [0.5.1] - 2026-10-23
+
+- Se corrigió el fallo del análisis de código de Obsidian Community provocado por una regla ESLint al revisar el controlador de eventos DOM.
+- Se actualizaron los encabezados de ajustes para utilizar `Setting.setHeading()`.
+- Se introdujeron compilaciones reproducibles mediante npm lockfile, una revisión ESLint más completa y la generación automática de artefactos.
+- Se añadieron attestations de GitHub y se eliminó el ZIP no admitido de la publicación.
+- Sin cambios en el comportamiento de los enlaces.
+
 ## [0.5.0] - 2026-10-23
 
 - Preparación para publicar el plugin como **Linker** en el directorio de la comunidad.

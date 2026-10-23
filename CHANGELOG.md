@@ -4,6 +4,14 @@
 
 All notable changes to Linker4Obsidian are documented here.
 
+## [0.5.1] - 2026-10-23
+
+- Resolved the Obsidian Community source-review crash caused by a DOM event callback matching a buggy sample-code lint rule.
+- Updated settings section headings to use the supported Obsidian `Setting.setHeading()` API.
+- Switched to reproducible npm lockfile builds, expanded lint checks, and generated release artifacts through GitHub Actions.
+- Added GitHub artifact attestations and removed the unsupported ZIP release asset.
+- No changes to link-conversion behavior.
+
 ## [0.5.0] - 2026-10-23
 
 - Prepared for submission to the Obsidian Community directory as **Linker**.

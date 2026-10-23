@@ -4,6 +4,14 @@
 
 这里记录 Linker4Obsidian 的重要更新。
 
+## [0.5.1] - 2026-10-23
+
+- 修复了 Obsidian Community 源代码检查因 DOM 事件处理器触发 ESLint 规则而异常终止的问题。
+- 设置页面标题改用 `Setting.setHeading()` API。
+- 引入 npm 锁定文件实现可复现构建、完整 ESLint 检查以及 GitHub Actions 自动生成发布文件。
+- 增加 GitHub 构建来源证明，发布附件不再包含额外的 ZIP。
+- 链接转换行为保持不变。
+
 ## [0.5.0] - 2026-10-23
 
 - 准备以 **Linker** 名称提交到 Obsidian 社区插件目录。

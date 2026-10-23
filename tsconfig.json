@@ -5,9 +5,17 @@
     "moduleResolution": "Node",
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["ES2021", "DOM"],
+    "lib": [
+      "ES2021",
+      "DOM"
+    ],
     "outDir": "build",
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": ["src/**/*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "main.js"
+  ]
 }

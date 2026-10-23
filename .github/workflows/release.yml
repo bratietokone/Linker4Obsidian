@@ -1,42 +1,44 @@
-name: Prepare plugin release
+name: Publish Linker release
 
+# A new manifest version on main is the release signal.
+# Manual dispatch can retry a failed publication without a local Git checkout.
 on:
   push:
-    tags:
-      - '*.*.*'
+    branches: [main]
+    paths:
+      - manifest.json
   workflow_dispatch:
 
 permissions:
   contents: write
 
+# Never publish two releases concurrently.
 concurrency:
-  group: release-${{ github.ref }}
+  group: linker-release
   cancel-in-progress: false
 
 jobs:
-  release:
+  publish:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Validate tag and manifest
+      - name: Validate release version
+        id: version
         shell: bash
         run: |
           set -euo pipefail
           VERSION="$(node -p "require('./manifest.json').version")"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
-          test "$VERSION" = "$PACKAGE_VERSION"
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            test "$GITHUB_REF" = "refs/heads/main"
-          else
-            test "$VERSION" = "$GITHUB_REF_NAME"
-          fi
+          test "$VERSION" = "$PACKAGE_VERSION"
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-      - name: Validate plugin manifest
+      - name: Validate manifest
         run: npm run validate
       - name: Typecheck
         run: npm run typecheck
@@ -46,47 +48,74 @@ jobs:
         run: npm test
       - name: Verify committed build matches source
         run: git diff --exit-code -- main.js
-      - name: Prepare assets and release notes
+      - name: Prepare release files and notes
         shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          VERSION="$(node -p "require('./manifest.json').version")"
           awk -v header="## [$VERSION]" '
             /^## \[/ { if (found) exit; if (index($0, header) == 1) { found=1; next } }
             found { print }
           ' CHANGELOG.md > release-notes.md
-          test -s release-notes.md
+          test -s release-notes.md || {
+            echo "::error::CHANGELOG.md has no release notes for $VERSION"
+            exit 1
+          }
           mkdir -p dist/linker
           cp main.js manifest.json dist/linker/
           (cd dist && zip -q -r "linker-v${VERSION}.zip" linker)
-      - name: Create draft GitHub release
+      - name: Publish verified release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
         run: |
           set -euo pipefail
-          TAG="$(node -p "require('./manifest.json').version")"
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            # The workflow runs only on main. Create a lightweight tag after
-            # validation, typechecking, build, and tests have passed.
-            EXISTING_SHA="$(git ls-remote --refs origin "refs/tags/${TAG}" | awk '{print $1}')"
-            if [[ -n "$EXISTING_SHA" && "$EXISTING_SHA" != "$GITHUB_SHA" ]]; then
-              echo "::error::Tag $TAG points to $EXISTING_SHA, not $GITHUB_SHA"
+          # Ignore an already published version. This makes manual reruns safe.
+          DRAFT=""
+          if DRAFT="$(gh release view "$VERSION" --json isDraft --jq '.isDraft' 2>/dev/null)"; then
+            if [[ "$DRAFT" == "false" ]]; then
+              echo "Release $VERSION is already published; leaving it unchanged."
+              exit 0
+            fi
+            if [[ "$DRAFT" != "true" ]]; then
+              echo "::error::Cannot determine existing release status for $VERSION"
               exit 1
             fi
-            if [[ -z "$EXISTING_SHA" ]]; then
-              gh api -X POST "repos/${GITHUB_REPOSITORY}/git/refs" \
-                -f "ref=refs/tags/${TAG}" \
-                -f "sha=${GITHUB_SHA}" >/dev/null
+          fi
+
+          # A tag may already exist after a failed attempt. Never move it.
+          TAG_SHA="$(git ls-remote --refs origin "refs/tags/${VERSION}" | awk '{print $1}')"
+          if [[ -n "$TAG_SHA" && "$TAG_SHA" != "$GITHUB_SHA" ]]; then
+            echo "::error::Tag $VERSION points to $TAG_SHA, not $GITHUB_SHA; refusing to publish."
+            exit 1
+          fi
+
+          if [[ "$DRAFT" == "true" ]]; then
+            echo "Resuming draft release $VERSION."
+            gh release upload "$VERSION" main.js manifest.json "dist/linker-v${VERSION}.zip" --clobber
+          else
+            # Upload as draft first; publish only once all files are present.
+            gh release create "$VERSION" \
+              main.js manifest.json "dist/linker-v${VERSION}.zip" \
+              --target "$GITHUB_SHA" \
+              --title "Linker $VERSION" \
+              --notes-file release-notes.md \
+              --draft
+          fi
+
+          ASSETS="$(gh release view "$VERSION" --json assets --jq '.assets[].name')"
+          for REQUIRED in main.js manifest.json "linker-v${VERSION}.zip"; do
+            if ! grep -Fxq "$REQUIRED" <<< "$ASSETS"; then
+              echo "::error::Missing release asset: $REQUIRED"
+              exit 1
             fi
-          fi
-          if gh release list --limit 100 --json tagName | jq -e --arg tag "$TAG" 'any(.[]; .tagName == $tag)' >/dev/null; then
-            echo "Release $TAG already exists; no overwrite."
-            exit 0
-          fi
-          gh release create "$TAG" \
-            main.js manifest.json "dist/linker-v${TAG}.zip" \
-            --target "$GITHUB_SHA" \
-            --title "Linker $TAG" \
+          done
+
+          gh release edit "$VERSION" \
+            --title "Linker $VERSION" \
             --notes-file release-notes.md \
-            --draft
+            --draft=false \
+            --latest
+          echo "Published Linker $VERSION."

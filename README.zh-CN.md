@@ -112,7 +112,7 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
 需要 Node.js 和 npm。TypeScript 源码位于 `src/`，本地化文件位于 `src/locales/`，使用 esbuild 打包成单个 `main.js`。
 
 ```bash
-npm install
+npm ci
 npm run typecheck
 npm run build
 npm test

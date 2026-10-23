@@ -123,7 +123,7 @@ The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite 
 Requires Node.js and npm. Source files are in `src/`, translations in `src/locales/`; the built `main.js` and `manifest.json` are in the repository root.
 
 ```bash
-npm install
+npm ci
 npm run typecheck
 npm run lint
 npm run build

@@ -123,7 +123,7 @@
 Требуются Node.js и npm. Исходный код находится в `src/`, переводы — в `src/locales/`, готовые `main.js` и `manifest.json` — в корне репозитория.
 
 ```bash
-npm install
+npm ci
 npm run typecheck
 npm run build
 npm test

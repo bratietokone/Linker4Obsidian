@@ -4,7 +4,7 @@
 
 Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian.md/). Mantiene los enlaces a notas Markdown como enlaces Wiki normales e incrusta automáticamente los archivos adjuntos compatibles. También convierte URL de vídeos de YouTube en reproductores integrados.
 
-**Versión:** 0.3.0 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
+**Versión:** 0.4.0 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
 
 ## Funciones
 
@@ -14,6 +14,8 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 - Ofrece vista previa y confirmación antes de convertir enlaces de la nota actual o toda la bóveda.
 - Interfaz en modo automático (idioma de Obsidian), English, Русский, Español y 简体中文.
 - No requiere cuenta ni servicio externo y no envía el contenido de tus notas a un servidor.
+
+- **Archivos y carpetas externos:** crea enlaces Markdown `file:///` y Wiki `[[external:...]]` a archivos externos sin copiarlos a la bóveda.
 
 ## Instalación (Windows, macOS y Linux)
 
@@ -66,6 +68,24 @@ Los ajustes, notificaciones y diálogos cambian inmediatamente. Para actualizar 
 
 Las reglas por categoría y las extensiones adicionales son configurables. **Usar siempre un enlace** tiene prioridad sobre **Incrustar siempre**. La vista previa depende de los formatos compatibles con Obsidian.
 
+## Archivos y carpetas externos
+
+En **Configuración → Linker4Obsidian → Archivos y carpetas externos** hay una página independiente. Activa los enlaces externos y elige Markdown o Wiki para crear enlaces nuevos; ambos formatos siguen funcionando.
+
+```markdown
+[Proyectos](<file:///home/user/Projects/>)
+[Informe](<file:///home/user/Documents/report.pdf>)
+
+[[external:/home/user/Projects/|Proyectos]]
+[[external:/home/user/Documents/report.pdf|Informe]]
+```
+
+Desde la paleta de comandos utiliza **Insertar enlace a archivo externo** o **Insertar enlace a carpeta externa**. Selecciona la ruta en el cuadro de diálogo nativo, si está disponible, o introduce una ruta absoluta manualmente. Puedes editar el nombre del enlace.
+
+Los enlaces se abren en el modo de lectura o Live Preview mediante la aplicación predeterminada o el gestor de archivos; también puedes elegir mostrar el destino en su carpeta. Los ejecutables nunca se lanzan automáticamente. Los archivos no encontrados muestran un aviso. No se admiten anfitriones de archivos remotos ni otros esquemas.
+
+**Nota:** no incrusta ni copia archivos externos y no modifica el tratamiento de los adjuntos de la bóveda.
+
 ## Uso
 
 - **Enlaces nuevos:** escribe `[[...]]` o selecciona un archivo con el autocompletado.
@@ -77,6 +97,7 @@ Las incrustaciones intencionales se conservan. Se omiten bloques de código, có
 
 ## Limitaciones
 
+- Las rutas externas son absolutas, específicas de cada equipo y pueden estar restringidas en entornos aislados como Flatpak.
 - Solo funciona en **Obsidian de escritorio**; no es compatible con la versión móvil.
 - No se incrustan enlaces exclusivos a listas de reproducción ni otros sitios web.
 - Los enlaces Markdown a archivos, como `[archivo](imagen.png)`, no se convierten a Wiki-embeds.

@@ -4,7 +4,7 @@
 
 A desktop [Obsidian](https://obsidian.md/) community plugin that automatically embeds supported attachments while keeping Markdown notes as ordinary Wiki-links. It can also turn standalone YouTube video URLs into embedded players.
 
-**Version:** 0.3.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
+**Version:** 0.4.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
 
 ## Features
 
@@ -14,6 +14,8 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 - Review changes before converting links in the current note or the entire vault.
 - User interface language: **Automatic (Obsidian language)**, **English**, **Русский**, **Español**, or **简体中文**. Settings, dialogs, and messages use the selected language; commands pick up a new language after reloading the plugin.
 - No account or additional runtime service is needed. The plugin does not send vault content to a server.
+
+- **External files and folders:** create Markdown `file:///` or Wiki `[[external:...]]` links to items outside the vault and open them using your OS. No attachments are copied.
 
 ## Installation (Windows, macOS, Linux)
 
@@ -76,6 +78,24 @@ Settings are translated immediately when you select a language. Notifications an
 
 Rule categories and extension overrides are configurable. **Always link** extension overrides have precedence over **Always embed** overrides. Actual previews depend on what Obsidian can render.
 
+## External files and folders
+
+Open **Settings → Linker4Obsidian → External files and folders** (a separate settings page). Enable external links and choose your preferred format for *new* links: Markdown or Wiki. Both formats can be opened regardless of this preference.
+
+```markdown
+[Projects](<file:///home/user/Projects/>)
+[Report](<file:///home/user/Documents/report.pdf>)
+
+[[external:/home/user/Projects/|Projects]]
+[[external:/home/user/Documents/report.pdf|Report]]
+```
+
+Use **Insert link to external file** or **Insert link to external folder** from the command palette. You can choose an item through the native file chooser, where supported, or type an absolute path manually. The optional display name is inserted as the link label.
+
+Click links in Reading View or Live Preview to open a file in its default OS application or open a directory in the file manager. In settings you may instead choose to reveal the target in the file manager. Executable files are never launched by this feature, only revealed. Invalid or missing paths produce a warning. Only local paths are supported; remote file hosts and non-file schemes are rejected.
+
+**External links never embed or copy files.** Existing rules for attachments inside the vault remain unchanged.
+
 ## Using Linker4Obsidian
 
 - **New links:** Enter a Wiki-link or select a file with Obsidian's built-in `[[` suggestions. The plugin normalizes new links to the configured format.
@@ -87,6 +107,7 @@ The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite 
 
 ## Limitations
 
+- External paths must be absolute, are device-specific, and may be inaccessible in sandboxed installations such as Flatpak.
 - This release is **desktop-only**, not a mobile plugin.
 - Only supported YouTube *video* URLs are embedded; playlist-only links and unrelated sites stay ordinary links. Sites that disallow embedding aren't forced into iframes.
 - Standard Markdown local-file links like `[file](image.png)` aren't converted into Wiki embeds.

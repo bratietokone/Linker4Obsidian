@@ -11,7 +11,8 @@ class MockPlugin {
   async loadData() { return storedData; }
   async saveData(data) { storedData = data; }
   addSettingTab(tab) { settingTab = tab; }
-  registerEditorExtension(handler) { updateCallback = handler; }
+  registerEditorExtension(handler) { if (typeof handler === 'function') updateCallback = handler; }
+  registerDomEvent() {}
   registerEvent() {}
   addCommand(command) { commands[command.id] = command; }
 }
@@ -22,7 +23,7 @@ const orig = Module._load;
 Module._load = function(request, parent, main) {
   if (request === 'obsidian') return { Plugin: MockPlugin, MarkdownView: MockMarkdownView, PluginSettingTab: MockSettingTab,
     Modal: class {}, Notice: class {}, Setting: class {}, App: class {}, Editor: class {}, TFile: class {}, getLanguage: () => uiLanguage };
-  if (request === '@codemirror/view') return { EditorView: MockCM };
+  if (request === '@codemirror/view') return { EditorView: MockCM, ViewPlugin: {fromClass: () => ({external: true})}, WidgetType: class {}, Decoration: {none: [], replace: () => ({range:()=>({})}), set:()=>[]} };
   return orig.call(this, request, parent, main);
 };
 const { default: Linker4Obsidian } = require('../main.js');
@@ -47,7 +48,11 @@ const app = {
   assert.equal(typeof mockEvents['editor-paste'], 'function');
   assert.equal(typeof commands['convert-current-note'].editorCallback, 'function');
   assert.equal(typeof commands['convert-entire-vault'].callback, 'function');
+  assert.equal(typeof commands['insert-external-file-link'].editorCallback, 'function');
+  assert.equal(typeof commands['insert-external-folder-link'].editorCallback, 'function');
   assert.equal(plugin.settings.language, 'auto');
+  assert.equal(plugin.settings.externalFormat, 'markdown');
+  assert.equal(plugin.settings.externalEnabled, true);
   assert.match(commands['convert-current-note'].name, /Предпросмотр/);
   assert.equal(typeof settingTab.display, 'function');
 
@@ -117,5 +122,5 @@ const app = {
   zhPlugin.app = app;
   await zhPlugin.onload();
   assert.match(commands['convert-entire-vault'].name, /预览/);
-  console.log('11 integration smoke tests passed.');
+  console.log('15 integration smoke tests passed.');
 })().catch(err=>{console.error(err);process.exitCode=1;});

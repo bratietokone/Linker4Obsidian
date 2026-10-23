@@ -3,6 +3,9 @@ import {
   Setting, TFile, getLanguage
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
+import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki,
+  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget,
+  type ExternalFormat, type ExternalOpenMode } from './externalLinks';
 import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
 type Behavior = 'link' | 'embed';
@@ -11,6 +14,9 @@ type Rules = Record<Category, Behavior>;
 
 interface LinkerSettings {
   language: LanguagePreference;
+  externalEnabled: boolean;
+  externalFormat: ExternalFormat;
+  externalOpenMode: ExternalOpenMode;
   automaticWiki: boolean;
   automaticYouTube: boolean;
   pasteYouTube: boolean;
@@ -21,6 +27,9 @@ interface LinkerSettings {
 
 const DEFAULT_SETTINGS: LinkerSettings = {
   language: 'auto',
+  externalEnabled: true,
+  externalFormat: 'markdown',
+  externalOpenMode: 'open',
   automaticWiki: true,
   automaticYouTube: true,
   pasteYouTube: true,
@@ -176,6 +185,8 @@ function transformText(
         const end = start + match[0].length;
         if ((start > 0 && line[start - 1] === '\\') || inInlineCode(line, start) ||
           !intersects({ from: pos + start, to: pos + end }, touched)) continue;
+        // external: is a separate link namespace, never an attachment.
+        if (match[2].startsWith('external:')) continue;
         const desired = linkBehavior(match[2], sourcePath, app, settings);
         // An explicit embed was a deliberate user choice: do not undo it.
         if (match[1] === '!' && desired === 'link') continue;
@@ -260,6 +271,33 @@ export default class Linker4ObsidianPlugin extends Plugin {
     const saved = await this.loadData() as Partial<LinkerSettings> | null;
     this.settings = { ...DEFAULT_SETTINGS, ...saved, rules: { ...DEFAULT_SETTINGS.rules, ...saved?.rules } };
     this.addSettingTab(new LinkerSettingTab(this.app, this));
+    const externalTranslate = (key: string, params: Record<string, string | number> = {}) =>
+      tr(this.settings, key as TranslationKey, params);
+    this.registerEditorExtension(getExternalEditorExtension(() => this.settings, externalTranslate));
+    if (typeof document !== 'undefined') {
+      this.registerDomEvent(document, 'click', (event: MouseEvent) => {
+        handleExternalAnchorClick(event, this.settings, externalTranslate);
+      }, true);
+    }
+
+    this.addCommand({
+      id: 'insert-external-file-link',
+      name: tr(this.settings, 'externalInsertFile'),
+      editorCallback: (editor: Editor) => {
+        if (!this.settings.externalEnabled) return;
+        new ExternalInsertModal(this.app, editor, 'file',
+          () => this.settings.externalFormat, externalTranslate).open();
+      }
+    });
+    this.addCommand({
+      id: 'insert-external-folder-link',
+      name: tr(this.settings, 'externalInsertFolder'),
+      editorCallback: (editor: Editor) => {
+        if (!this.settings.externalEnabled) return;
+        new ExternalInsertModal(this.app, editor, 'directory',
+          () => this.settings.externalFormat, externalTranslate).open();
+      }
+    });
 
     this.registerEditorExtension(EditorView.updateListener.of((update: ViewUpdate) => {
       if (!update.docChanged || !(this.settings.automaticWiki || this.settings.automaticYouTube) ||
@@ -402,12 +440,48 @@ export default class Linker4ObsidianPlugin extends Plugin {
 }
 
 class LinkerSettingTab extends PluginSettingTab {
+  private activeSection: 'general' | 'external' = 'general';
   constructor(app: App, private plugin: Linker4ObsidianPlugin) { super(app, plugin); }
   display(): void {
     const { containerEl } = this;
     const t = (key: TranslationKey) => tr(this.plugin.settings, key);
     containerEl.empty();
     containerEl.createEl('h2', { text: 'Linker4Obsidian' });
+    // Separate settings pages while preserving support for Obsidian 1.8.7+.
+    new Setting(containerEl)
+      .addButton(btn => {
+        btn.setButtonText(t('tabGeneral'));
+        if (this.activeSection === 'general') btn.setCta();
+        btn.onClick(() => { this.activeSection = 'general'; this.display(); });
+      })
+      .addButton(btn => {
+        btn.setButtonText(t('tabExternal'));
+        if (this.activeSection === 'external') btn.setCta();
+        btn.onClick(() => { this.activeSection = 'external'; this.display(); });
+      });
+    if (this.activeSection === 'external') {
+      new Setting(containerEl).setName(t('externalEnabled')).setDesc(t('externalEnabledDesc'))
+        .addToggle(toggle => toggle.setValue(this.plugin.settings.externalEnabled).onChange(async value => {
+          this.plugin.settings.externalEnabled = value;
+          await this.plugin.saveSettings();
+        }));
+      new Setting(containerEl).setName(t('externalFormat')).setDesc(t('externalFormatDesc'))
+        .addDropdown(dropdown => dropdown.addOptions({
+          markdown: t('externalMarkdown'), wiki: t('externalWiki')
+        }).setValue(this.plugin.settings.externalFormat).onChange(async value => {
+          this.plugin.settings.externalFormat = value as ExternalFormat;
+          await this.plugin.saveSettings();
+        }));
+      new Setting(containerEl).setName(t('externalOpenMode')).setDesc(t('externalOpenModeDesc'))
+        .addDropdown(dropdown => dropdown.addOptions({
+          open: t('externalModeOpen'), reveal: t('externalModeReveal')
+        }).setValue(this.plugin.settings.externalOpenMode).onChange(async value => {
+          this.plugin.settings.externalOpenMode = value as ExternalOpenMode;
+          await this.plugin.saveSettings();
+        }));
+      containerEl.createEl('p', { text: t('externalSettingsHint') });
+      return;
+    }
     new Setting(containerEl).setName(t('language')).setDesc(t('languageDesc'))
       .addDropdown(d => d.addOptions({
         auto: t('languageAuto'), en: t('languageEnglish'), ru: t('languageRussian'),
@@ -463,4 +537,4 @@ class LinkerSettingTab extends PluginSettingTab {
 }
 
 /** Pure helpers exposed for automated regression tests. */
-export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr };
+export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget };

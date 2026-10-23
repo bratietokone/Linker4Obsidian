@@ -4,7 +4,7 @@
 
 Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。它让 Markdown 笔记保持为普通 Wiki 链接，同时根据规则自动嵌入受支持的附件；还可以将单独的 YouTube 视频网址转换为嵌入式播放器。
 
-**版本：** 0.3.0 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
+**版本：** 0.4.0 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
 
 ## 功能
 
@@ -14,6 +14,8 @@ Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区
 - 批量转换当前笔记或整个库中的已有链接前，会先预览并要求确认。
 - 界面支持自动（跟随 Obsidian）、English、Русский、Español 和简体中文。
 - 无需账号或外部服务，不会将笔记库内容发送到服务器。
+
+- **外部文件与文件夹：** 创建 Markdown `file:///` 或 Wiki `[[external:...]]` 链接，无需将文件复制进笔记库。
 
 ## 安装（Windows、macOS 和 Linux）
 
@@ -66,6 +68,24 @@ Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区
 
 可以自定义文件类型和扩展名。**始终保留链接** 的优先级高于 **始终嵌入**。附件能否预览取决于 Obsidian 是否支持该格式。
 
+## 外部文件与文件夹
+
+在 **设置 → Linker4Obsidian → 外部文件与文件夹** 中，有独立的设置页面。可以启用外部链接，并选择新链接使用 Markdown 或 Wiki 格式；两种格式均可打开。
+
+```markdown
+[项目](<file:///home/user/Projects/>)
+[报告](<file:///home/user/Documents/report.pdf>)
+
+[[external:/home/user/Projects/|项目]]
+[[external:/home/user/Documents/report.pdf|报告]]
+```
+
+通过命令面板中的 **插入外部文件链接** 或 **插入外部文件夹链接** 选择文件或文件夹。可以使用系统文件选择器（如可用），也可以手动输入绝对路径，并修改链接名称。
+
+在阅读模式或 Live Preview 中点击链接，会使用默认应用或文件管理器打开；也可以在设置中选择仅显示目标所在位置。可执行文件不会由该功能直接运行。无效或不存在的路径会显示提示。暂不支持远程文件主机或其他 URI 协议。
+
+**注意：** 不会复制或嵌入外部文件，也不会修改现有附件规则。
+
 ## 使用方法
 
 - **新链接：** 输入 `[[...]]` 或通过自动补全选择文件。
@@ -77,6 +97,7 @@ Linker4Obsidian 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区
 
 ## 限制
 
+- 外部路径必须为绝对路径，因设备而异；Flatpak 等沙箱环境可能限制访问。
 - 仅支持 **桌面版 Obsidian**。
 - 不会嵌入只有播放列表的链接或其他网站的内容。
 - 不会将 `[文件](图片.png)` 这样的普通 Markdown 文件链接转换为 Wiki 嵌入。

@@ -125,6 +125,7 @@ Requires Node.js and npm. Source files are in `src/`, translations in `src/local
 ```bash
 npm install
 npm run typecheck
+npm run lint
 npm run build
 npm test
 ```

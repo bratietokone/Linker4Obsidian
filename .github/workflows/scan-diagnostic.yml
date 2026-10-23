@@ -4,6 +4,7 @@ on:
     branches: [diagnostics/obsidian-scanner-fatal]
     paths:
       - scanner-test.config.mjs
+      - tsconfig.json
       - .github/workflows/scan-diagnostic.yml
 jobs:
   scan:

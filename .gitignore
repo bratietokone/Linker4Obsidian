@@ -30,3 +30,6 @@ npm-debug.log*
 *.zip
 .DS_Store
 Thumbs.db
+
+# The compiled plugin is a release artifact, not source code (Obsidian template).
+main.js

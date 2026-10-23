@@ -445,7 +445,6 @@ class LinkerSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     const t = (key: TranslationKey) => tr(this.plugin.settings, key);
     containerEl.empty();
-    containerEl.createEl('h2', { text: 'Linker' });
     // Separate settings pages while preserving support for Obsidian 1.8.7+.
     new Setting(containerEl)
       .addButton(btn => {
@@ -507,7 +506,7 @@ class LinkerSettingTab extends PluginSettingTab {
         this.plugin.settings.pasteYouTube = value;
         await this.plugin.saveSettings();
       }));
-    containerEl.createEl('h3', { text: t('fileRules') });
+    new Setting(containerEl).setName(t('fileRules')).setHeading();
     const labels: { cat: Category; name: TranslationKey; desc: string }[] = [
       { cat: 'markdown', name: 'markdown', desc: '.md, .markdown' },
       { cat: 'image', name: 'image', desc: EXTENSIONS.image.join(', ') },
@@ -524,7 +523,7 @@ class LinkerSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           }));
     }
-    containerEl.createEl('h3', { text: t('extraExtensions') });
+    new Setting(containerEl).setName(t('extraExtensions')).setHeading();
     new Setting(containerEl).setName(t('alwaysEmbed')).setDesc(t('alwaysEmbedDesc'))
       .addText(field => field.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
         .onChange(async value => { this.plugin.settings.additionalEmbedExtensions = value; await this.plugin.saveSettings(); }));

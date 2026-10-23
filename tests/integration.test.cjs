@@ -21,7 +21,7 @@ Module._load = function(request, parent, main) {
   if (request === '@codemirror/view') return { EditorView: MockCM };
   return orig.call(this, request, parent, main);
 };
-const { default: SmartEmbed } = require('../main.js');
+const { default: Linker4Obsidian } = require('../main.js');
 Module._load = orig;
 
 const activeFile = { path: 'test.md', extension: 'md' };
@@ -36,7 +36,7 @@ const app = {
 };
 
 (async () => {
-  const plugin = new SmartEmbed();
+  const plugin = new Linker4Obsidian();
   plugin.app = app;
   await plugin.onload();
   assert.equal(typeof updateCallback, 'function');

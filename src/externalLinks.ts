@@ -65,7 +65,7 @@ export function readExternalLinkFromWiki(value: string): { target: string; label
 }
 
 export function isExecutablePath(filename: string): boolean {
-  return /\.(exe|com|bat|cmd|ps1|sh|desktop|app|msi|scr|jar|run)$/i.test(filename);
+  return /\.(exe|com|bat|cmd|ps1|sh|desktop|app|appimage|command|bin|msi|scr|jar|run|lnk|url)$/i.test(filename);
 }
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -74,7 +74,13 @@ export async function openExternalTarget(target: string, mode: ExternalOpenMode,
   const filename = resolveExternalTarget(target);
   if (!filename) { new Notice(t('externalInvalidPath')); return; }
   let isDirectory: boolean;
-  try { isDirectory = (await fs.promises.stat(filename)).isDirectory(); }
+  let isExecutable: boolean;
+  try {
+    const stat = await fs.promises.stat(filename);
+    isDirectory = stat.isDirectory();
+    isExecutable = isExecutablePath(filename) ||
+      (!isDirectory && process.platform !== 'win32' && (stat.mode & 0o111) !== 0);
+  }
   catch { new Notice(t('externalMissing', { path: filename })); return; }
   try {
     const shell = (require('electron') as { shell?: {
@@ -83,7 +89,7 @@ export async function openExternalTarget(target: string, mode: ExternalOpenMode,
     }}).shell;
     if (!shell) throw new Error('Electron shell is unavailable');
     // Never execute potentially executable files: only reveal them to the user.
-    if (mode === 'reveal' || (!isDirectory && isExecutablePath(filename))) {
+    if (mode === 'reveal' || isExecutable) {
       shell.showItemInFolder(filename);
     } else {
       const error = await shell.openPath(filename);
@@ -149,7 +155,10 @@ export class ExternalInsertModal extends Modal {
     new Setting(contentEl).setName(this.t('externalDisplayName')).addText(input => {
       nameField = input;
       input.setPlaceholder(this.t('externalDisplayPlaceholder'))
-        .onChange(value => { this.editedName = true; this.displayName = value; });
+        .onChange(value => {
+          if (value !== this.displayName) this.editedName = true;
+          this.displayName = value;
+        });
     });
     new Setting(contentEl)
       .addButton(button => button.setButtonText(this.t('externalBrowse')).onClick(async () => {

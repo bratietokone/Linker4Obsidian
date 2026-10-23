@@ -6,8 +6,8 @@
 
 ## [0.5.0] - 2026-10-23
 
-- 准备以 **Linker4** 名称提交到 Obsidian 社区插件目录。
-- 插件 ID 从 `linker4obsidian` 改为 `linker-four`；现有安装需要手动迁移。
+- 准备以 **Linker** 名称提交到 Obsidian 社区插件目录。
+- 插件 ID 从 `linker4obsidian` 改为 `linker`；现有安装需要手动迁移。
 - 增加清单、版本一致性自动校验。
 - GitHub Actions 根据 `0.5.0`（无 `v` 前缀）版本标签创建草稿发布。
 - 链接转换行为没有改变。

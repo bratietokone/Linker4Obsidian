@@ -1,4 +1,4 @@
-# Linker4
+# Linker
 
 **Idioma de la documentación:** [English](README.md) | [Русский](README.ru.md) | [Español](README.es.md) | [简体中文](README.zh-CN.md)
 
@@ -17,7 +17,7 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 
 - **Archivos y carpetas externos:** crea enlaces Markdown `file:///` y Wiki `[[external:...]]` a archivos externos sin copiarlos a la bóveda.
 
-> **Migración desde Linker4Obsidian 0.4.0 o anterior:** el ID ha cambiado de `linker4obsidian` a `linker-four`. Desactiva el plugin anterior, instala Linker4 0.5.0 o posterior en `.obsidian/plugins/linker-four/` y copia el antiguo `data.json` si deseas conservar los ajustes. Comprueba la instalación antes de eliminar la carpeta anterior.
+> **Migración desde Linker4Obsidian 0.4.0 o anterior:** el ID ha cambiado de `linker4obsidian` a `linker`. Desactiva el plugin anterior, instala Linker 0.5.0 o posterior en `.obsidian/plugins/linker/` y copia el antiguo `data.json` si deseas conservar los ajustes. Comprueba la instalación antes de eliminar la carpeta anterior.
 
 **Acceso al sistema de archivos y privacidad:** la función de enlaces externos (solo escritorio) consulta mediante Node.js los metadatos de la ruta local que el usuario elige o abre, y emplea Electron para abrir o mostrar el archivo o carpeta. Ese acceso fuera de la bóveda solo se necesita para esta función. El plugin no lee ni transmite el contenido de archivos externos, no envía notas y no recopila telemetría.
 
@@ -25,35 +25,35 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 
 > Antes de realizar conversiones masivas, haz una copia de seguridad de la bóveda o utiliza una bóveda de prueba.
 
-1. Abre [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Mientras el repositorio sea privado, necesitarás acceso. Descarga `main.js` y `manifest.json` de los archivos de la versión (**Assets**) o el archivo `linker4-vX.Y.Z.zip`.
-2. En tu **bóveda de Obsidian** (no en la carpeta de instalación del programa), abre o crea `.obsidian/plugins/linker-four/`.
-3. Coloca allí `main.js` y `manifest.json`. Si utilizas el ZIP, extrae la carpeta `linker-four/` dentro de `.obsidian/plugins/`.
+1. Abre [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Mientras el repositorio sea privado, necesitarás acceso. Descarga `main.js` y `manifest.json` de los archivos de la versión (**Assets**) o el archivo `linker-vX.Y.Z.zip`.
+2. En tu **bóveda de Obsidian** (no en la carpeta de instalación del programa), abre o crea `.obsidian/plugins/linker/`.
+3. Coloca allí `main.js` y `manifest.json`. Si utilizas el ZIP, extrae la carpeta `linker/` dentro de `.obsidian/plugins/`.
 
    ```text
    TuBoveda/
    └── .obsidian/
        └── plugins/
-           └── linker-four/
+           └── linker/
                ├── main.js
                └── manifest.json
    ```
 
-4. Reinicia Obsidian (o recarga los plugins de la comunidad), abre **Configuración → Plugins de la comunidad** y activa **Linker4**.
+4. Reinicia Obsidian (o recarga los plugins de la comunidad), abre **Configuración → Plugins de la comunidad** y activa **Linker**.
 5. Abre la configuración del plugin para seleccionar el idioma y las reglas.
 
 ### Mostrar la carpeta oculta
 
 | Sistema | Ejemplo de ruta | Mostrar archivos ocultos |
 | --- | --- | --- |
-| Windows | `C:\\Users\\<usuario>\\Documents\\MiBoveda\\.obsidian\\plugins\\linker-four\\` | Explorador: Ver → Mostrar → Elementos ocultos. |
-| macOS | `/Users/<usuario>/Documents/MiBoveda/.obsidian/plugins/linker-four/` | Finder: **Cmd+Shift+.** |
-| Linux | `/home/<usuario>/Documents/MiBoveda/.obsidian/plugins/linker-four/` | Gestor de archivos: **Ctrl+H**. |
+| Windows | `C:\\Users\\<usuario>\\Documents\\MiBoveda\\.obsidian\\plugins\\linker\\` | Explorador: Ver → Mostrar → Elementos ocultos. |
+| macOS | `/Users/<usuario>/Documents/MiBoveda/.obsidian/plugins/linker/` | Finder: **Cmd+Shift+.** |
+| Linux | `/home/<usuario>/Documents/MiBoveda/.obsidian/plugins/linker/` | Gestor de archivos: **Ctrl+H**. |
 
-Son solo ejemplos: tu bóveda puede estar en cualquier ubicación. No crees una carpeta duplicada `linker-four/linker-four/`.
+Son solo ejemplos: tu bóveda puede estar en cualquier ubicación. No crees una carpeta duplicada `linker/linker/`.
 
 ## Idioma de la interfaz
 
-En **Configuración → Linker4 → Idioma de la interfaz** selecciona **Automático**, **English**, **Русский**, **Español** o **简体中文**. Automático sigue el idioma de Obsidian cuando esté disponible; para los idiomas no admitidos se usa inglés.
+En **Configuración → Linker → Idioma de la interfaz** selecciona **Automático**, **English**, **Русский**, **Español** o **简体中文**. Automático sigue el idioma de Obsidian cuando esté disponible; para los idiomas no admitidos se usa inglés.
 
 Los ajustes, notificaciones y diálogos cambian inmediatamente. Para actualizar los nombres de comandos en la paleta, recarga el plugin.
 
@@ -74,7 +74,7 @@ Las reglas por categoría y las extensiones adicionales son configurables. **Usa
 
 ## Archivos y carpetas externos
 
-En **Configuración → Linker4 → Archivos y carpetas externos** hay una página independiente. Activa los enlaces externos y elige Markdown o Wiki para crear enlaces nuevos; ambos formatos siguen funcionando.
+En **Configuración → Linker → Archivos y carpetas externos** hay una página independiente. Activa los enlaces externos y elige Markdown o Wiki para crear enlaces nuevos; ambos formatos siguen funcionando.
 
 ```markdown
 [Proyectos](<file:///home/user/Projects/>)
@@ -93,7 +93,7 @@ Los enlaces se abren en el modo de lectura o Live Preview mediante la aplicació
 ## Uso
 
 - **Enlaces nuevos:** escribe `[[...]]` o selecciona un archivo con el autocompletado.
-- **Arrastrar y pegar archivos:** Obsidian gestiona el archivo; Linker4 aplica la regla cuando Obsidian inserta un enlace Wiki.
+- **Arrastrar y pegar archivos:** Obsidian gestiona el archivo; Linker aplica la regla cuando Obsidian inserta un enlace Wiki.
 - **YouTube:** pega la URL de un vídeo en una línea independiente y adecuada.
 - **Notas existentes:** abre la paleta de comandos (`Ctrl+P` / `Cmd+P`) y elige la conversión con vista previa para la nota actual o toda la bóveda.
 

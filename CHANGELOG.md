@@ -6,8 +6,8 @@ All notable changes to Linker4Obsidian are documented here.
 
 ## [0.5.0] - 2026-10-23
 
-- Prepared for submission to the Obsidian Community directory as **Linker4**.
-- Changed the plugin ID from `linker4obsidian` to `linker-four` to meet directory rules. Existing installations require manual migration.
+- Prepared for submission to the Obsidian Community directory as **Linker**.
+- Changed the plugin ID from `linker4obsidian` to `linker` to meet directory rules. Existing installations require manual migration.
 - Aligned version metadata and added automated manifest validation.
 - Updated GitHub Actions to prepare draft releases from version tags like `0.5.0` (without `v`).
 - Link processing behavior is unchanged.

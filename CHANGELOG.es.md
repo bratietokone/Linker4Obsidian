@@ -6,8 +6,8 @@ Principales cambios de Linker4Obsidian.
 
 ## [0.5.0] - 2026-10-23
 
-- Preparación para publicar el plugin como **Linker4** en el directorio de la comunidad.
-- El ID cambió de `linker4obsidian` a `linker-four`; las instalaciones existentes requieren una migración manual.
+- Preparación para publicar el plugin como **Linker** en el directorio de la comunidad.
+- El ID cambió de `linker4obsidian` a `linker`; las instalaciones existentes requieren una migración manual.
 - Verificación automática del manifiesto y las versiones.
 - GitHub Actions prepara versiones borrador a partir de etiquetas como `0.5.0` (sin `v`).
 - Sin cambios en la conversión de enlaces.

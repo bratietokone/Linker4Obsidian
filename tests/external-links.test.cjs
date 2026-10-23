@@ -40,7 +40,7 @@ const t = (key, params={}) => key + (params.path || '');
 
 (async () => {
   const fileLink = __test.createExternalLink(file, 'Report', 'markdown');
-  assert.match(fileLink, /^\\[Report\\]\\(<file:\/\/\//);
+  assert.match(fileLink, /^\[Report\]\(<file:\/\/\//);
   await __test.openExternalTarget(__test.createExternalLink(file, '', 'wiki')
     .match(/\[\[(.+?)\|/)[1], 'open', t);
   assert.deepEqual(called.open, [file]);

@@ -9,6 +9,11 @@ assert.match(manifest.name, /^[a-zA-Z0-9 ()+\-]+$/, 'Invalid display name');
 assert.ok(!/obsidian|obsi-|\-sidian|plugin/i.test(manifest.name), 'Invalid plugin name');
 assert.match(manifest.version, /^\d+\.\d+\.\d+$/, 'Version must be x.y.z');
 assert.equal(manifest.version, pkg.version, 'Versions in manifest and package must match');
+const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+assert.equal(lock.version, pkg.version, 'Versions in package-lock and package must match');
+assert.equal(lock.packages[''].version, pkg.version, 'Root package-lock version must match');
+assert.deepEqual(lock.packages[''].devDependencies, pkg.devDependencies,
+  'Root package-lock dependencies must match package.json');
 assert.equal(manifest.isDesktopOnly, true, 'Node/Electron APIs require desktop-only');
 assert.ok(manifest.description.length <= 250 && manifest.description.endsWith('.'), 'Description must be short and end in a period');
 assert.ok(manifest.minAppVersion && manifest.author, 'Missing required manifest fields');

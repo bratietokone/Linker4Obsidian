@@ -275,9 +275,8 @@ export default class LinkerPlugin extends Plugin {
       tr(this.settings, key as TranslationKey, params);
     this.registerEditorExtension(getExternalEditorExtension(() => this.settings, externalTranslate));
     if (typeof document !== 'undefined') {
-      this.registerDomEvent(document, 'click', (event: MouseEvent) => {
-        handleExternalAnchorClick(event, this.settings, externalTranslate);
-      }, true);
+      this.registerDomEvent(document, 'click', (event: MouseEvent) =>
+        handleExternalAnchorClick(event, this.settings, externalTranslate), true);
     }
 
     this.addCommand({

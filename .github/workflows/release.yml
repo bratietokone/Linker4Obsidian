@@ -69,7 +69,7 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             # The workflow runs only on main. Create a lightweight tag after
             # validation, typechecking, build, and tests have passed.
-            EXISTING_SHA="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${TAG}" --jq '.object.sha' 2>/dev/null || true)"
+            EXISTING_SHA="$(git ls-remote --refs origin "refs/tags/${TAG}" | awk '{print $1}')"
             if [[ -n "$EXISTING_SHA" && "$EXISTING_SHA" != "$GITHUB_SHA" ]]; then
               echo "::error::Tag $TAG points to $EXISTING_SHA, not $GITHUB_SHA"
               exit 1
@@ -80,7 +80,7 @@ jobs:
                 -f "sha=${GITHUB_SHA}" >/dev/null
             fi
           fi
-          if gh release view "$TAG" >/dev/null 2>&1; then
+          if gh release list --limit 100 --json tagName | jq -e --arg tag "$TAG" 'any(.[]; .tagName == $tag)' >/dev/null; then
             echo "Release $TAG already exists; no overwrite."
             exit 0
           fi

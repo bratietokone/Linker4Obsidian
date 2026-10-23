@@ -1,8 +1,16 @@
 # Changelog
 
-**Language:** [English](CHANGELOG.md) | [Русский](CHANGELOG.ru.md)
+**Language:** [English](CHANGELOG.md) | [Русский](CHANGELOG.ru.md) | [Español](CHANGELOG.es.md) | [简体中文](CHANGELOG.zh-CN.md)
 
 All notable changes to Linker4Obsidian are documented here.
+
+## [0.3.0] - 2026-10-23
+
+- Added Spanish and Simplified Chinese interface translations and automatic locale detection.
+- Extracted all translations into type-checked `src/locales/` modules.
+- Introduced esbuild to package all locale modules into one installable `main.js`.
+- Added Spanish and Simplified Chinese README and CHANGELOG files.
+- Preserved existing link rules and language settings.
 
 ## [0.2.0] - 2026-10-23
 

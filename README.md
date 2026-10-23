@@ -1,10 +1,10 @@
 # Linker4Obsidian
 
-**Documentation language:** [English](README.md) | [Русский](README.ru.md)
+**Documentation language:** [English](README.md) | [Русский](README.ru.md) | [Español](README.es.md) | [简体中文](README.zh-CN.md)
 
 A desktop [Obsidian](https://obsidian.md/) community plugin that automatically embeds supported attachments while keeping Markdown notes as ordinary Wiki-links. It can also turn standalone YouTube video URLs into embedded players.
 
-**Version:** 0.2.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
+**Version:** 0.3.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
 
 ## Features
 
@@ -12,7 +12,7 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 - Newly typed or pasted Wiki-links, including results of `[[` autocompletion, are processed in the editor.
 - YouTube links (`youtube.com`, `youtu.be`, Shorts, `/live/`) are converted to `![](URL)` when pasted in a suitable location or processed by the conversion command.
 - Review changes before converting links in the current note or the entire vault.
-- User interface language: **Automatic (Obsidian language)**, **English**, or **Русский**. Settings, dialogs, and messages use the selected language; commands pick up a new language after reloading the plugin.
+- User interface language: **Automatic (Obsidian language)**, **English**, **Русский**, **Español**, or **简体中文**. Settings, dialogs, and messages use the selected language; commands pick up a new language after reloading the plugin.
 - No account or additional runtime service is needed. The plugin does not send vault content to a server.
 
 ## Installation (Windows, macOS, Linux)
@@ -53,11 +53,13 @@ Open **Settings → Linker4Obsidian → Interface language** and select:
 
 | Option | What it does |
 | --- | --- |
-| Automatic (default) | Uses the current Obsidian UI language when available. English is the fallback for other languages. |
+| Automatic (default) | Uses the current Obsidian UI language when available. English is the fallback for unsupported languages. |
 | English | Forces English regardless of Obsidian's language. |
 | Русский | Forces Russian regardless of Obsidian's language. |
+| Español | Forces Spanish regardless of Obsidian's language. |
+| 简体中文 | Forces Simplified Chinese regardless of Obsidian's language. |
 
-Settings are translated immediately when you select a language. Notifications and conversion dialogs use the chosen language. **Reload the plugin** to update the registered command names in the command palette. Future translations can be added without changing link rules.
+Settings are translated immediately when you select a language. Notifications and conversion dialogs use the chosen language. **Reload the plugin** to update the registered command names in the command palette. All interface translations are maintained in separate, type-checked `src/locales/` modules.
 
 ## Default link rules
 
@@ -93,7 +95,7 @@ The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite 
 
 ## Development
 
-Requires Node.js and npm. Source files are in `src/`; the built `main.js` and `manifest.json` are in the repository root.
+Requires Node.js and npm. Source files are in `src/`, translations in `src/locales/`; the built `main.js` and `manifest.json` are in the repository root.
 
 ```bash
 npm install

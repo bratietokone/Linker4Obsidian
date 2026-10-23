@@ -1,5 +1,5 @@
 // Match the Obsidian Community scanner's security-error / advisory-warning split.
-// Lint actual plugin source, not bundled main.js, tests, or localization strings.
+// Lint plugin sources AND bundled main.js, matching the Obsidian Community source scanner.
 import { defineConfig, globalIgnores } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 
@@ -30,7 +30,6 @@ const recommended = obsidianmd.configs.recommended.map(config => ({
 
 export default defineConfig([
   globalIgnores([
-    "main.js",
     "dist/**",
     "build/**",
     "tests/**",

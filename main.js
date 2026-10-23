@@ -31,7 +31,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var main_exports = {};
 __export(main_exports, {
   __test: () => __test,
-  default: () => Linker4Plugin
+  default: () => LinkerPlugin
 });
 module.exports = __toCommonJS(main_exports);
 var import_obsidian2 = require("obsidian");
@@ -119,7 +119,7 @@ async function openExternalTarget(target, mode, t) {
       if (error) throw new Error(error);
     }
   } catch (error) {
-    console.error("Linker4: cannot open external file", error);
+    console.error("Linker: cannot open external file", error);
     new import_obsidian.Notice(t("externalOpenFailed"));
   }
 }
@@ -142,7 +142,7 @@ async function chooseNativePath(kind) {
     });
     return result.canceled ? null : result.filePaths[0] || null;
   } catch (error) {
-    console.error("Linker4: native picker failed", error);
+    console.error("Linker: native picker failed", error);
     return null;
   }
 }
@@ -306,7 +306,7 @@ function handleExternalAnchorClick(event, config, t) {
 // src/locales/en.ts
 var EN = {
   language: "Interface language",
-  languageDesc: "Choose the language for Linker4 independently of Obsidian.",
+  languageDesc: "Choose the language for Linker independently of Obsidian.",
   languageAuto: "Automatic (Obsidian language)",
   languageEnglish: "English",
   languageRussian: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
@@ -341,11 +341,11 @@ var EN = {
   vaultTitle: "Convert links in the entire vault?",
   currentDescription: "{count} changes proposed. Code fences and frontmatter will be skipped.",
   vaultDescription: "{count} changes in {files} notes. Back up your vault before a bulk operation.",
-  noChanges: "Linker4: no changes needed.",
-  applied: "Linker4: applied {count} changes.",
-  vaultApplied: "Linker4: converted {count} links.{errors}",
+  noChanges: "Linker: no changes needed.",
+  applied: "Linker: applied {count} changes.",
+  vaultApplied: "Linker: converted {count} links.{errors}",
   vaultErrors: " Errors: {count}.",
-  modalError: "Linker4: conversion failed. Check the developer console.",
+  modalError: "Linker: conversion failed. Check the developer console.",
   lineExample: "Line {line}: {before} \u2192 {after}",
   moreExamples: "...and {count} more",
   cancel: "Cancel",
@@ -380,7 +380,7 @@ var EN = {
 // src/locales/ru.ts
 var RU = {
   language: "\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430",
-  languageDesc: "\u042F\u0437\u044B\u043A Linker4 \u043C\u043E\u0436\u043D\u043E \u0432\u044B\u0431\u0440\u0430\u0442\u044C \u043D\u0435\u0437\u0430\u0432\u0438\u0441\u0438\u043C\u043E \u043E\u0442 \u044F\u0437\u044B\u043A\u0430 Obsidian.",
+  languageDesc: "\u042F\u0437\u044B\u043A Linker \u043C\u043E\u0436\u043D\u043E \u0432\u044B\u0431\u0440\u0430\u0442\u044C \u043D\u0435\u0437\u0430\u0432\u0438\u0441\u0438\u043C\u043E \u043E\u0442 \u044F\u0437\u044B\u043A\u0430 Obsidian.",
   languageAuto: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 (\u044F\u0437\u044B\u043A Obsidian)",
   languageEnglish: "English",
   languageRussian: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
@@ -415,11 +415,11 @@ var RU = {
   vaultTitle: "\u041F\u0440\u0435\u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u0442\u044C \u0441\u0441\u044B\u043B\u043A\u0438 \u0432\u043E \u0432\u0441\u0451\u043C \u0445\u0440\u0430\u043D\u0438\u043B\u0438\u0449\u0435?",
   currentDescription: "\u041F\u0440\u0435\u0434\u043B\u0430\u0433\u0430\u0435\u0442\u0441\u044F {count} \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439. \u0422\u0435\u043A\u0441\u0442 \u0432 \u043A\u043E\u0434\u043E\u0432\u044B\u0445 \u0431\u043B\u043E\u043A\u0430\u0445 \u0438 frontmatter \u043F\u0440\u043E\u043F\u0443\u0441\u043A\u0430\u0435\u0442\u0441\u044F.",
   vaultDescription: "{count} \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439 \u0432 {files} \u0437\u0430\u043C\u0435\u0442\u043A\u0430\u0445. \u041F\u0435\u0440\u0435\u0434 \u043C\u0430\u0441\u0441\u043E\u0432\u043E\u0439 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0435\u0439 \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u0442\u0441\u044F \u0440\u0435\u0437\u0435\u0440\u0432\u043D\u0430\u044F \u043A\u043E\u043F\u0438\u044F.",
-  noChanges: "Linker4: \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439 \u043D\u0435 \u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F.",
-  applied: "Linker4: \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u043E {count} \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439.",
-  vaultApplied: "Linker4: \u043F\u0440\u0435\u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u043D\u043E {count} \u0441\u0441\u044B\u043B\u043E\u043A.{errors}",
+  noChanges: "Linker: \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439 \u043D\u0435 \u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F.",
+  applied: "Linker: \u043F\u0440\u0438\u043C\u0435\u043D\u0435\u043D\u043E {count} \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u0439.",
+  vaultApplied: "Linker: \u043F\u0440\u0435\u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u043D\u043E {count} \u0441\u0441\u044B\u043B\u043E\u043A.{errors}",
   vaultErrors: " \u041E\u0448\u0438\u0431\u043E\u043A: {count}.",
-  modalError: "Linker4: \u043E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0435\u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u043D\u0438\u044F. \u041F\u0440\u043E\u0432\u0435\u0440\u044C\u0442\u0435 \u043A\u043E\u043D\u0441\u043E\u043B\u044C.",
+  modalError: "Linker: \u043E\u0448\u0438\u0431\u043A\u0430 \u043F\u0440\u0435\u043E\u0431\u0440\u0430\u0437\u043E\u0432\u0430\u043D\u0438\u044F. \u041F\u0440\u043E\u0432\u0435\u0440\u044C\u0442\u0435 \u043A\u043E\u043D\u0441\u043E\u043B\u044C.",
   lineExample: "\u0421\u0442\u0440\u043E\u043A\u0430 {line}: {before} \u2192 {after}",
   moreExamples: "...\u0438 \u0435\u0449\u0451 {count}",
   cancel: "\u041E\u0442\u043C\u0435\u043D\u0430",
@@ -454,7 +454,7 @@ var RU = {
 // src/locales/es.ts
 var ES = {
   language: "Idioma de la interfaz",
-  languageDesc: "Elige el idioma de Linker4 independientemente del idioma de Obsidian.",
+  languageDesc: "Elige el idioma de Linker independientemente del idioma de Obsidian.",
   languageAuto: "Autom\xE1tico (idioma de Obsidian)",
   languageEnglish: "English",
   languageRussian: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
@@ -489,11 +489,11 @@ var ES = {
   vaultTitle: "\xBFConvertir los enlaces de toda la b\xF3veda?",
   currentDescription: "Se proponen {count} cambios. Se omitir\xE1n los bloques de c\xF3digo y los metadatos iniciales.",
   vaultDescription: "{count} cambios en {files} notas. Haz una copia de seguridad antes de la conversi\xF3n masiva.",
-  noChanges: "Linker4: no es necesario hacer cambios.",
-  applied: "Linker4: se aplicaron {count} cambios.",
-  vaultApplied: "Linker4: se convirtieron {count} enlaces.{errors}",
+  noChanges: "Linker: no es necesario hacer cambios.",
+  applied: "Linker: se aplicaron {count} cambios.",
+  vaultApplied: "Linker: se convirtieron {count} enlaces.{errors}",
   vaultErrors: " Errores: {count}.",
-  modalError: "Linker4: error durante la conversi\xF3n. Consulta la consola de desarrollo.",
+  modalError: "Linker: error durante la conversi\xF3n. Consulta la consola de desarrollo.",
   lineExample: "L\xEDnea {line}: {before} \u2192 {after}",
   moreExamples: "...y {count} m\xE1s",
   cancel: "Cancelar",
@@ -528,7 +528,7 @@ var ES = {
 // src/locales/zh-CN.ts
 var ZH_CN = {
   language: "\u754C\u9762\u8BED\u8A00",
-  languageDesc: "\u5355\u72EC\u8BBE\u7F6E Linker4 \u7684\u754C\u9762\u8BED\u8A00\uFF0C\u4E0D\u53D7 Obsidian \u8BED\u8A00\u8BBE\u7F6E\u9650\u5236\u3002",
+  languageDesc: "\u5355\u72EC\u8BBE\u7F6E Linker \u7684\u754C\u9762\u8BED\u8A00\uFF0C\u4E0D\u53D7 Obsidian \u8BED\u8A00\u8BBE\u7F6E\u9650\u5236\u3002",
   languageAuto: "\u81EA\u52A8\uFF08\u8DDF\u968F Obsidian\uFF09",
   languageEnglish: "English",
   languageRussian: "\u0420\u0443\u0441\u0441\u043A\u0438\u0439",
@@ -563,11 +563,11 @@ var ZH_CN = {
   vaultTitle: "\u8981\u8F6C\u6362\u6574\u4E2A\u5E93\u4E2D\u7684\u94FE\u63A5\u5417\uFF1F",
   currentDescription: "\u8BA1\u5212\u4FEE\u6539 {count} \u5904\u3002\u5C06\u8DF3\u8FC7\u4EE3\u7801\u5757\u548C YAML \u524D\u7F6E\u5143\u6570\u636E\u3002",
   vaultDescription: "\u5C06\u5728 {files} \u7BC7\u7B14\u8BB0\u4E2D\u4FEE\u6539 {count} \u5904\u3002\u6279\u91CF\u64CD\u4F5C\u524D\u8BF7\u5148\u5907\u4EFD\u3002",
-  noChanges: "Linker4\uFF1A\u65E0\u9700\u4FEE\u6539\u3002",
-  applied: "Linker4\uFF1A\u5DF2\u5E94\u7528 {count} \u5904\u4FEE\u6539\u3002",
-  vaultApplied: "Linker4\uFF1A\u5DF2\u8F6C\u6362 {count} \u4E2A\u94FE\u63A5\u3002{errors}",
+  noChanges: "Linker\uFF1A\u65E0\u9700\u4FEE\u6539\u3002",
+  applied: "Linker\uFF1A\u5DF2\u5E94\u7528 {count} \u5904\u4FEE\u6539\u3002",
+  vaultApplied: "Linker\uFF1A\u5DF2\u8F6C\u6362 {count} \u4E2A\u94FE\u63A5\u3002{errors}",
   vaultErrors: " \u9519\u8BEF\uFF1A{count} \u4E2A\u3002",
-  modalError: "Linker4\uFF1A\u8F6C\u6362\u5931\u8D25\uFF0C\u8BF7\u67E5\u770B\u5F00\u53D1\u8005\u63A7\u5236\u53F0\u3002",
+  modalError: "Linker\uFF1A\u8F6C\u6362\u5931\u8D25\uFF0C\u8BF7\u67E5\u770B\u5F00\u53D1\u8005\u63A7\u5236\u53F0\u3002",
   lineExample: "\u7B2C {line} \u884C\uFF1A{before} \u2192 {after}",
   moreExamples: "\u2026\u2026\u4EE5\u53CA\u5176\u4ED6 {count} \u5904",
   cancel: "\u53D6\u6D88",
@@ -827,7 +827,7 @@ var ConfirmModal = class extends import_obsidian2.Modal {
       try {
         await this.onConfirm();
       } catch (err) {
-        console.error("Linker4: conversion failed", err);
+        console.error("Linker: conversion failed", err);
         new import_obsidian2.Notice(tr(this.settings, "modalError"));
       }
     }));
@@ -836,7 +836,7 @@ var ConfirmModal = class extends import_obsidian2.Modal {
     this.contentEl.empty();
   }
 };
-var Linker4Plugin = class extends import_obsidian2.Plugin {
+var LinkerPlugin = class extends import_obsidian2.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -1038,7 +1038,7 @@ var Linker4Plugin = class extends import_obsidian2.Plugin {
                 }
               } catch (e) {
                 errors++;
-                console.error("Linker4: failed on", file.path, e);
+                console.error("Linker: failed on", file.path, e);
               }
             }
             new import_obsidian2.Notice(tr(this.settings, "vaultApplied", { count: changed, errors: errors ? tr(this.settings, "vaultErrors", { count: errors }) : "" }), 8e3);
@@ -1061,7 +1061,7 @@ var LinkerSettingTab = class extends import_obsidian2.PluginSettingTab {
     const { containerEl } = this;
     const t = (key) => tr(this.plugin.settings, key);
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Linker4" });
+    containerEl.createEl("h2", { text: "Linker" });
     new import_obsidian2.Setting(containerEl).addButton((btn) => {
       btn.setButtonText(t("tabGeneral"));
       if (this.activeSection === "general") btn.setCta();

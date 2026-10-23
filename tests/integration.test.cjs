@@ -26,7 +26,7 @@ Module._load = function(request, parent, main) {
   if (request === '@codemirror/view') return { EditorView: MockCM, ViewPlugin: {fromClass: () => ({external: true})}, WidgetType: class {}, Decoration: {none: [], replace: () => ({range:()=>({})}), set:()=>[]} };
   return orig.call(this, request, parent, main);
 };
-const { default: Linker4 } = require('../main.js');
+const { default: Linker } = require('../main.js');
 Module._load = orig;
 
 const activeFile = { path: 'test.md', extension: 'md' };
@@ -41,7 +41,7 @@ const app = {
 };
 
 (async () => {
-  const plugin = new Linker4();
+  const plugin = new Linker();
   plugin.app = app;
   await plugin.onload();
   assert.equal(typeof updateCallback, 'function');
@@ -100,25 +100,25 @@ const app = {
   assert.equal(protectedPaste, false);
   // Explicit language override persists for the next plugin load.
   storedData = {language:'en'};
-  const enPlugin = new Linker4();
+  const enPlugin = new Linker();
   enPlugin.app = app;
   await enPlugin.onload();
   assert.match(commands['convert-current-note'].name, /Preview/);
   assert.equal(enPlugin.settings.language, 'en');
   uiLanguage = 'en';
   storedData = {language:'ru'};
-  const ruPlugin = new Linker4();
+  const ruPlugin = new Linker();
   ruPlugin.app = app;
   await ruPlugin.onload();
   assert.match(commands['convert-entire-vault'].name, /Предпросмотр/);
   // New language preferences persist across plugin loads and affect commands.
   storedData = { language: 'es' };
-  const esPlugin = new Linker4();
+  const esPlugin = new Linker();
   esPlugin.app = app;
   await esPlugin.onload();
   assert.match(commands['convert-current-note'].name, /Vista previa/);
   storedData = { language: 'zh-CN' };
-  const zhPlugin = new Linker4();
+  const zhPlugin = new Linker();
   zhPlugin.app = app;
   await zhPlugin.onload();
   assert.match(commands['convert-entire-vault'].name, /预览/);

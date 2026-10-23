@@ -1,10 +1,10 @@
-# Linker4Obsidian
+# Linker4
 
 **Documentation language:** [English](README.md) | [Русский](README.ru.md) | [Español](README.es.md) | [简体中文](README.zh-CN.md)
 
 A desktop [Obsidian](https://obsidian.md/) community plugin that automatically embeds supported attachments while keeping Markdown notes as ordinary Wiki-links. It can also turn standalone YouTube video URLs into embedded players.
 
-**Version:** 0.4.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
+**Version:** 0.5.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
 
 ## Features
 
@@ -17,41 +17,43 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 
 - **External files and folders:** create Markdown `file:///` or Wiki `[[external:...]]` links to items outside the vault and open them using your OS. No attachments are copied.
 
+> **Migrating from Linker4Obsidian 0.4.0 or earlier:** the plugin ID changed from `linker4obsidian` to `linker-four`. Disable the old plugin, install Linker4 0.5.0 or later into `.obsidian/plugins/linker-four/`, and copy the old `data.json` if you want to preserve settings. Verify the new installation before deleting the old plugin folder. Older release packages use a different ID.
+
 ## Installation (Windows, macOS, Linux)
 
 > Before a first installation or any bulk conversion, make a backup of your vault or test the plugin in a separate vault.
 
 The installation process is the same on every supported desktop operating system. **This version requires manual installation**, because it has not been accepted into the official Obsidian directory.
 
-1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) (access is required while the repository is private). From the release **Assets**, download both `main.js` and `manifest.json`, or download `linker4obsidian-vX.Y.Z.zip` and extract it.
-2. Open the **vault** you want to use, not Obsidian's application installation directory. Find or create its hidden `.obsidian/plugins/linker4obsidian/` folder.
-3. Place both files in that folder, preserving their original names. If using the ZIP, it already includes a `linker4obsidian/` folder, which should sit inside `.obsidian/plugins/`:
+1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) (access is required while the repository is private). From the release **Assets**, download both `main.js` and `manifest.json`, or download `linker4-vX.Y.Z.zip` and extract it.
+2. Open the **vault** you want to use, not Obsidian's application installation directory. Find or create its hidden `.obsidian/plugins/linker-four/` folder.
+3. Place both files in that folder, preserving their original names. If using the ZIP, it already includes a `linker-four/` folder, which should sit inside `.obsidian/plugins/`:
 
    ```text
    YourVault/
    └── .obsidian/
        └── plugins/
-           └── linker4obsidian/
+           └── linker-four/
                ├── manifest.json
                └── main.js
    ```
 
-4. Restart Obsidian, or reload your community plugins. Open **Settings → Community plugins**. Enable community plugins (if disabled), then enable **Linker4Obsidian**.
-5. Open **Settings → Linker4Obsidian** (usually under Community plugins) to choose your interface language and link rules.
+4. Restart Obsidian, or reload your community plugins. Open **Settings → Community plugins**. Enable community plugins (if disabled), then enable **Linker4**.
+5. Open **Settings → Linker4** (usually under Community plugins) to choose your interface language and link rules.
 
 ### Where is the vault's plugin directory?
 
 | System | Example vault path | Showing hidden folders |
 | --- | --- | --- |
-| Windows | `C:\Users\<you>\Documents\MyVault\.obsidian\plugins\linker4obsidian\` | In File Explorer, enable **View → Show → Hidden items** (wording varies by version). |
-| macOS | `/Users/<you>/Documents/MyVault/.obsidian/plugins/linker4obsidian/` | In Finder press **Cmd+Shift+.** to show hidden files. |
-| Linux | `/home/<you>/Documents/MyVault/.obsidian/plugins/linker4obsidian/` | In most file managers press **Ctrl+H** to show hidden files. |
+| Windows | `C:\Users\<you>\Documents\MyVault\.obsidian\plugins\linker-four\` | In File Explorer, enable **View → Show → Hidden items** (wording varies by version). |
+| macOS | `/Users/<you>/Documents/MyVault/.obsidian/plugins/linker-four/` | In Finder press **Cmd+Shift+.** to show hidden files. |
+| Linux | `/home/<you>/Documents/MyVault/.obsidian/plugins/linker-four/` | In most file managers press **Ctrl+H** to show hidden files. |
 
-These are **examples**, not fixed locations. Your vault may be anywhere, including another drive or a synced folder. The `.obsidian` directory is inside the vault. Avoid an extra nesting level such as `linker4obsidian/linker4obsidian/`.
+These are **examples**, not fixed locations. Your vault may be anywhere, including another drive or a synced folder. The `.obsidian` directory is inside the vault. Avoid an extra nesting level such as `linker-four/linker-four/`.
 
 ## Interface language
 
-Open **Settings → Linker4Obsidian → Interface language** and select:
+Open **Settings → Linker4 → Interface language** and select:
 
 | Option | What it does |
 | --- | --- |
@@ -80,7 +82,7 @@ Rule categories and extension overrides are configurable. **Always link** extens
 
 ## External files and folders
 
-Open **Settings → Linker4Obsidian → External files and folders** (a separate settings page). Enable external links and choose your preferred format for *new* links: Markdown or Wiki. Both formats can be opened regardless of this preference.
+Open **Settings → Linker4 → External files and folders** (a separate settings page). Enable external links and choose your preferred format for *new* links: Markdown or Wiki. Both formats can be opened regardless of this preference.
 
 ```markdown
 [Projects](<file:///home/user/Projects/>)
@@ -96,12 +98,12 @@ Click links in Reading View or Live Preview to open a file in its default OS app
 
 **External links never embed or copy files.** Existing rules for attachments inside the vault remain unchanged.
 
-## Using Linker4Obsidian
+## Using Linker4
 
 - **New links:** Enter a Wiki-link or select a file with Obsidian's built-in `[[` suggestions. The plugin normalizes new links to the configured format.
 - **Files dragged or pasted into a note:** When Obsidian creates a Wiki-link, the plugin applies its file rules. Obsidian handles copying attachments into the vault; the plugin does not manage file copying.
 - **YouTube:** Paste a video URL onto a suitable line. Links within ordinary paragraphs aren't converted automatically to avoid disrupting your text.
-- **Existing notes:** Open the command palette (`Ctrl+P` / `Cmd+P`) and find **Linker4Obsidian: Preview and convert links in current note** or **Linker4Obsidian: Preview and convert links in entire vault** (names appear in Russian when the Russian interface was active at plugin load). Review the preview and confirm before modifying any notes.
+- **Existing notes:** Open the command palette (`Ctrl+P` / `Cmd+P`) and find **Linker4: Preview and convert links in current note** or **Linker4: Preview and convert links in entire vault** (names appear in Russian when the Russian interface was active at plugin load). Review the preview and confirm before modifying any notes.
 
 The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite fenced code blocks, YAML frontmatter, inline code, or HTML-comment lines. Bulk conversion changes existing notes only after confirmation. **Back up the vault before batch conversion.**
 

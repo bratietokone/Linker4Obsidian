@@ -27,7 +27,7 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 
 The installation process is the same on every supported desktop operating system. **This version requires manual installation**, because it has not been accepted into the official Obsidian directory.
 
-1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) (access is required while the repository is private). From the release **Assets**, download both `main.js` and `manifest.json`, or download `linker-vX.Y.Z.zip` and extract it.
+1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Download `main.js` and `manifest.json` from the **Assets** section of the chosen release. Older releases (including 0.5.0) also provide an optional ZIP archive.
 2. Open the **vault** you want to use, not Obsidian's application installation directory. Find or create its hidden `.obsidian/plugins/linker/` folder.
 3. Place both files in that folder, preserving their original names. If using the ZIP, it already includes a `linker/` folder, which should sit inside `.obsidian/plugins/`:
 

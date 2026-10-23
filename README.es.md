@@ -25,7 +25,7 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 
 > Antes de realizar conversiones masivas, haz una copia de seguridad de la bóveda o utiliza una bóveda de prueba.
 
-1. Abre [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Mientras el repositorio sea privado, necesitarás acceso. Descarga `main.js` y `manifest.json` de los archivos de la versión (**Assets**) o el archivo `linker-vX.Y.Z.zip`.
+1. Abre [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Descarga `main.js` y `manifest.json` desde **Assets** de la versión elegida. Las versiones anteriores, incluida la 0.5.0, también tienen un ZIP opcional.
 2. En tu **bóveda de Obsidian** (no en la carpeta de instalación del programa), abre o crea `.obsidian/plugins/linker/`.
 3. Coloca allí `main.js` y `manifest.json`. Si utilizas el ZIP, extrae la carpeta `linker/` dentro de `.obsidian/plugins/`.
 

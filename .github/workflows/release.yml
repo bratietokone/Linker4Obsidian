@@ -11,6 +11,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  attestations: write
 
 # Never publish two releases concurrently.
 concurrency:
@@ -62,9 +64,12 @@ jobs:
             echo "::error::CHANGELOG.md has no release notes for $VERSION"
             exit 1
           }
-          mkdir -p dist/linker
-          cp main.js manifest.json dist/linker/
-          (cd dist && zip -q -r "linker-v${VERSION}.zip" linker)
+      - name: Attest release files
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
       - name: Publish verified release
         shell: bash
         env:
@@ -94,11 +99,11 @@ jobs:
 
           if [[ "$DRAFT" == "true" ]]; then
             echo "Resuming draft release $VERSION."
-            gh release upload "$VERSION" main.js manifest.json "dist/linker-v${VERSION}.zip" --clobber
+            gh release upload "$VERSION" main.js manifest.json --clobber
           else
             # Upload as draft first; publish only once all files are present.
             gh release create "$VERSION" \
-              main.js manifest.json "dist/linker-v${VERSION}.zip" \
+              main.js manifest.json \
               --target "$GITHUB_SHA" \
               --title "Linker $VERSION" \
               --notes-file release-notes.md \
@@ -106,7 +111,7 @@ jobs:
           fi
 
           ASSETS="$(gh release view "$VERSION" --json assets --jq '.assets[].name')"
-          for REQUIRED in main.js manifest.json "linker-v${VERSION}.zip"; do
+          for REQUIRED in main.js manifest.json; do
             if ! grep -Fxq "$REQUIRED" <<< "$ASSETS"; then
               echo "::error::Missing release asset: $REQUIRED"
               exit 1

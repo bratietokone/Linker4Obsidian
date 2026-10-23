@@ -25,7 +25,7 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
 
 > 初次使用或批量转换之前，请备份笔记库，或先在测试库中试用。
 
-1. 打开 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases)。私有仓库需要访问权限。从 **Assets** 下载 `main.js` 和 `manifest.json`，或下载 `linker-vX.Y.Z.zip`。
+1. 打开 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases)。在所选版本的 **Assets** 中下载 `main.js` 和 `manifest.json`。旧版本（包括 0.5.0）还提供可选的 ZIP 压缩包。
 2. 找到 **Obsidian 笔记库目录**（不是应用安装目录）。在库中创建或打开 `.obsidian/plugins/linker/`。
 3. 将 `main.js` 和 `manifest.json` 放入其中。ZIP 已包含 `linker/` 目录，应直接解压到 `.obsidian/plugins/`。
 

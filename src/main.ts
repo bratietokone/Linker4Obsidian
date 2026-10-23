@@ -4,7 +4,7 @@ import {
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki,
-  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal,
+  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget,
   type ExternalFormat, type ExternalOpenMode } from './externalLinks';
 import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
@@ -537,4 +537,4 @@ class LinkerSettingTab extends PluginSettingTab {
 }
 
 /** Pure helpers exposed for automated regression tests. */
-export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki };
+export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget };

@@ -16,3 +16,12 @@ jobs:
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
+      - name: Package test build
+        run: |
+          mkdir -p dist/linker4obsidian
+          cp main.js manifest.json dist/linker4obsidian/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linker4obsidian-test-build
+          path: dist/
+          if-no-files-found: error

@@ -51,8 +51,14 @@ jobs:
         run: npm run build
       - name: Test
         run: npm test
-      - name: Verify committed build matches source
-        run: git diff --exit-code -- main.js
+      - name: Verify deterministic build output
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp main.js /tmp/linker-first-build.js
+          npm run build
+          cmp -s main.js /tmp/linker-first-build.js
+          sha256sum main.js
       - name: Prepare release files and notes
         shell: bash
         env:

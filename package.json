@@ -8,7 +8,7 @@
     "test": "node tests/linker.test.cjs && node tests/integration.test.cjs && node tests/external-links.test.cjs",
     "typecheck": "tsc --noEmit --skipLibCheck -p tsconfig.json",
     "validate": "node scripts/validate-manifest.cjs",
-    "lint": "eslint . --quiet"
+    "lint": "eslint ."
   },
   "devDependencies": {
     "obsidian": "^1.14.4",

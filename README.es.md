@@ -109,11 +109,12 @@ Las incrustaciones intencionales se conservan. Se omiten bloques de código, có
 
 ## Desarrollo
 
-Requiere Node.js y npm. El código TypeScript está en `src/`, las traducciones en `src/locales/` y esbuild crea un único `main.js`.
+Requiere Node.js y npm. El código TypeScript está en `src/`, las traducciones en `src/locales/` y esbuild genera `main.js` durante la compilación; no se guarda en Git y se adjunta automáticamente a GitHub Releases.
 
 ```bash
 npm ci
 npm run typecheck
+npm run lint
 npm run build
 npm test
 ```
@@ -122,7 +123,7 @@ GitHub Actions ejecuta las mismas comprobaciones.
 
 ## Publicar una versión nueva
 
-Actualiza `manifest.json` y `package.json` a la misma versión nueva `X.Y.Z` y añade la sección `## [X.Y.Z]` a `CHANGELOG.md`. Si cambió el código, reconstruye y confirma `main.js`. Integra todo en `main`. El flujo [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) valida, compila, ejecuta las pruebas y publica automáticamente la versión de GitHub con la etiqueta `X.Y.Z` (sin `v`). Si falla alguna comprobación, no publica nada. No es necesario crear etiquetas ni publicar borradores manualmente. Puedes reintentarlo con **Run workflow** en `main`. Las versiones publicadas no se sobrescriben.
+Actualiza `manifest.json` y `package.json` a la misma versión nueva `X.Y.Z` y añade la sección `## [X.Y.Z]` a `CHANGELOG.md`. Integra los cambios del código fuente y la versión en `main`. GitHub Actions compila `main.js` y lo adjunta a la versión; no debes incluir el archivo generado en Git. El flujo [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) valida, compila, ejecuta las pruebas y publica automáticamente la versión de GitHub con la etiqueta `X.Y.Z` (sin `v`). Si falla alguna comprobación, no publica nada. No es necesario crear etiquetas ni publicar borradores manualmente. Puedes reintentarlo con **Run workflow** en `main`. Las versiones publicadas no se sobrescriben.
 
 ## Enlaces
 

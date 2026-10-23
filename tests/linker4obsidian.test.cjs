@@ -6,13 +6,14 @@ const path = require('node:path');
 execFileSync('node', [path.join(__dirname, '..', 'scripts', 'build.cjs')], { stdio: 'inherit' });
 const load = Module._load;
 Module._load = function(request, parent, isMain) {
-  if (request === 'obsidian') return { App: class {}, Editor: class {}, MarkdownView: class {}, Modal: class {}, Notice: class {}, Plugin: class {}, PluginSettingTab: class {}, Setting: class {}, TFile: class {} };
+  if (request === 'obsidian') return { App: class {}, Editor: class {}, MarkdownView: class {}, Modal: class {}, Notice: class {}, Plugin: class {}, PluginSettingTab: class {}, Setting: class {}, TFile: class {}, getLanguage: () => 'en' };
   if (request === '@codemirror/view') return { EditorView: class {} };
   return load.call(this, request, parent, isMain);
 };
 const { __test } = require('../main.js');
 Module._load = load;
 const defaults = {
+  language: 'auto',
   automaticWiki: true, automaticYouTube: true, pasteYouTube: true,
   rules: { markdown: 'link', image: 'embed', pdf: 'embed', video: 'embed', audio: 'embed', other: 'link' },
   additionalEmbedExtensions: '', additionalLinkExtensions: ''
@@ -65,7 +66,13 @@ const tests = [
   () => assert.equal(__test.youtubeEmbed('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12'), '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12)'),
   () => assert.equal(__test.youtubeEmbed('https://youtube.com.evil.tld/watch?v=dQw4w9WgXcQ'), null),
   () => assert.equal(__test.youtubeEmbed('javascript:alert(1)'), null),
-  () => assert.equal(__test.inInlineCode('prefix `code` after', 14), false)
+  () => assert.equal(__test.inInlineCode('prefix `code` after', 14), false),
+  () => assert.equal(__test.resolvedLocale(defaults), 'en'),
+  () => assert.equal(__test.resolvedLocale({ ...defaults, language: 'ru' }), 'ru'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'apply'), 'Apply'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'apply'), 'Применить'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'applied', { count: 3 }), 'Linker4Obsidian: применено 3 изменений.'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'applied', { count: 3 }), 'Linker4Obsidian: applied 3 changes.')
 ];
 for (let i = 0; i < tests.length; i++) {
   try { tests[i](); }

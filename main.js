@@ -4,6 +4,7 @@ exports.__test = void 0;
 const obsidian_1 = require("obsidian");
 const view_1 = require("@codemirror/view");
 const DEFAULT_SETTINGS = {
+    language: 'auto',
     automaticWiki: true,
     automaticYouTube: true,
     pasteYouTube: true,
@@ -11,6 +12,105 @@ const DEFAULT_SETTINGS = {
     additionalEmbedExtensions: '',
     additionalLinkExtensions: ''
 };
+/** UI strings only: generated Markdown and note content are never translated. */
+const EN = {
+    language: 'Interface language',
+    languageDesc: 'Choose the language for Linker4Obsidian independently of Obsidian.',
+    languageAuto: 'Automatic (Obsidian language)',
+    languageEnglish: 'English',
+    languageRussian: 'Русский',
+    languageChanged: 'Settings language updated. Reload the plugin to update command palette names.',
+    automaticWiki: 'Automatically process Wiki-links',
+    automaticWikiDesc: 'Apply file-type rules to newly created or pasted [[links]], without rewriting the entire document.',
+    automaticYouTube: 'YouTube → embedded player',
+    automaticYouTubeDesc: 'Convert standalone YouTube URLs and Markdown links when processing existing notes.',
+    pasteYouTube: 'Embed YouTube on paste',
+    pasteYouTubeDesc: 'Insert ![](URL) when a YouTube video URL is pasted into an eligible line.',
+    fileRules: 'File type rules',
+    markdown: 'Markdown notes',
+    image: 'Images',
+    pdf: 'PDF files',
+    video: 'Video files',
+    audio: 'Audio files',
+    other: 'Unknown file types',
+    otherDesc: 'Normal links by default',
+    link: 'Link [[...]]',
+    embed: 'Embed ![[...]]',
+    extraExtensions: 'Additional extensions',
+    alwaysEmbed: 'Always embed',
+    alwaysEmbedDesc: 'Comma-separated extensions such as epub, tif. The file can be displayed only if Obsidian supports it.',
+    alwaysLink: 'Always link',
+    alwaysLinkDesc: 'Takes priority over embed rules. For example: zip, md.',
+    existingLinksHint: 'Existing links are changed only through command palette actions. Back up your notes first.',
+    currentCommand: 'Preview and convert links in current note',
+    vaultCommand: 'Preview and convert links in entire vault',
+    currentTitle: 'Convert links in the current note?',
+    vaultTitle: 'Convert links in the entire vault?',
+    currentDescription: '{count} changes proposed. Code fences and frontmatter will be skipped.',
+    vaultDescription: '{count} changes in {files} notes. Back up your vault before a bulk operation.',
+    noChanges: 'Linker4Obsidian: no changes needed.',
+    applied: 'Linker4Obsidian: applied {count} changes.',
+    vaultApplied: 'Linker4Obsidian: converted {count} links.{errors}',
+    vaultErrors: ' Errors: {count}.',
+    modalError: 'Linker4Obsidian: conversion failed. Check the developer console.',
+    lineExample: 'Line {line}: {before} → {after}',
+    moreExamples: '...and {count} more',
+    cancel: 'Cancel',
+    apply: 'Apply'
+};
+const RU = {
+    language: 'Язык интерфейса',
+    languageDesc: 'Язык Linker4Obsidian можно выбрать независимо от языка Obsidian.',
+    languageAuto: 'Автоматически (язык Obsidian)',
+    languageEnglish: 'English',
+    languageRussian: 'Русский',
+    languageChanged: 'Язык настроек изменён. Перезагрузите плагин, чтобы обновить названия команд в палитре.',
+    automaticWiki: 'Автоматическая обработка Wiki-ссылок',
+    automaticWikiDesc: 'Применяет правила типов файлов к новым или вставленным [[ссылкам]], не переписывая весь документ.',
+    automaticYouTube: 'YouTube → встроенный плеер',
+    automaticYouTubeDesc: 'Преобразовывать одиночные YouTube URL и Markdown-ссылки при обработке существующих заметок.',
+    pasteYouTube: 'Встраивать YouTube при вставке',
+    pasteYouTubeDesc: 'При вставке URL ролика на YouTube в подходящую строку используется ![](URL).',
+    fileRules: 'Правила по типам файлов',
+    markdown: 'Заметки Markdown',
+    image: 'Изображения',
+    pdf: 'PDF-файлы',
+    video: 'Видеофайлы',
+    audio: 'Аудиофайлы',
+    other: 'Неизвестные типы',
+    otherDesc: 'По умолчанию обычная ссылка',
+    link: 'Обычная ссылка [[...]]',
+    embed: 'Встроить ![[...]]',
+    extraExtensions: 'Дополнительные расширения',
+    alwaysEmbed: 'Всегда встраивать',
+    alwaysEmbedDesc: 'Расширения через запятую, например epub, tif. Формат должен поддерживаться Obsidian.',
+    alwaysLink: 'Всегда оставлять ссылкой',
+    alwaysLinkDesc: 'Приоритет выше правила встраивания. Например zip, md.',
+    existingLinksHint: 'Существующие ссылки изменяются только командами через палитру команд. Начните с резервной копии заметок.',
+    currentCommand: 'Предпросмотр и преобразование ссылок в текущей заметке',
+    vaultCommand: 'Предпросмотр и преобразование ссылок во всём хранилище',
+    currentTitle: 'Преобразовать ссылки в текущей заметке?',
+    vaultTitle: 'Преобразовать ссылки во всём хранилище?',
+    currentDescription: 'Предлагается {count} изменений. Текст в кодовых блоках и frontmatter пропускается.',
+    vaultDescription: '{count} изменений в {files} заметках. Перед массовой операцией рекомендуется резервная копия.',
+    noChanges: 'Linker4Obsidian: изменений не требуется.',
+    applied: 'Linker4Obsidian: применено {count} изменений.',
+    vaultApplied: 'Linker4Obsidian: преобразовано {count} ссылок.{errors}',
+    vaultErrors: ' Ошибок: {count}.',
+    modalError: 'Linker4Obsidian: ошибка преобразования. Проверьте консоль.',
+    lineExample: 'Строка {line}: {before} → {after}',
+    moreExamples: '...и ещё {count}',
+    cancel: 'Отмена',
+    apply: 'Применить'
+};
+const TRANSLATIONS = { en: EN, ru: RU };
+function resolvedLocale(settings) {
+    const lang = settings.language === 'auto' ? (0, obsidian_1.getLanguage)() : settings.language;
+    return lang.toLowerCase().split(/[-_]/)[0] === 'ru' ? 'ru' : 'en';
+}
+function tr(settings, key, params = {}) {
+    return TRANSLATIONS[resolvedLocale(settings)][key].replace(/\{(\w+)\}/g, (match, name) => Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : match);
+}
 const EXTENSIONS = {
     markdown: ['md', 'markdown'],
     image: ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'avif', 'bmp'],
@@ -205,23 +305,24 @@ function transformText(text, sourcePath, app, settings, touched, only) {
     }
     return { text: result, changes };
 }
-function diffExamples(before, after, limit = 6) {
+function diffExamples(before, after, settings, limit = 6) {
     const a = before.split('\n'), b = after.split('\n');
     const examples = [];
     for (let i = 0; i < Math.min(a.length, b.length) && examples.length < limit; i++) {
         if (a[i] === b[i])
             continue;
         const clip = (s) => s.trim().slice(0, 100);
-        examples.push(`Строка ${i + 1}: ${clip(a[i])} → ${clip(b[i])}`);
+        examples.push(tr(settings, 'lineExample', { line: i + 1, before: clip(a[i]), after: clip(b[i]) }));
     }
     return examples;
 }
 class ConfirmModal extends obsidian_1.Modal {
-    constructor(app, titleText, description, examples, onConfirm) {
+    constructor(app, titleText, description, examples, settings, onConfirm) {
         super(app);
         this.titleText = titleText;
         this.description = description;
         this.examples = examples;
+        this.settings = settings;
         this.onConfirm = onConfirm;
     }
     onOpen() {
@@ -234,18 +335,18 @@ class ConfirmModal extends obsidian_1.Modal {
             for (const example of this.examples.slice(0, 20))
                 list.createEl('li', { text: example });
             if (this.examples.length > 20)
-                contentEl.createEl('p', { text: `...и ещё ${this.examples.length - 20}` });
+                contentEl.createEl('p', { text: tr(this.settings, 'moreExamples', { count: this.examples.length - 20 }) });
         }
         new obsidian_1.Setting(contentEl)
-            .addButton(btn => btn.setButtonText('Отмена').onClick(() => this.close()))
-            .addButton(btn => btn.setButtonText('Применить').setCta().onClick(async () => {
+            .addButton(btn => btn.setButtonText(tr(this.settings, 'cancel')).onClick(() => this.close()))
+            .addButton(btn => btn.setButtonText(tr(this.settings, 'apply')).setCta().onClick(async () => {
             this.close();
             try {
                 await this.onConfirm();
             }
             catch (err) {
                 console.error('Linker4Obsidian: conversion failed', err);
-                new obsidian_1.Notice('Linker4Obsidian: ошибка преобразования. Проверьте консоль.');
+                new obsidian_1.Notice(tr(this.settings, 'modalError'));
             }
         }));
     }
@@ -362,29 +463,29 @@ class Linker4ObsidianPlugin extends obsidian_1.Plugin {
             editor.replaceSelection(embed);
         }));
         this.addCommand({
-            id: 'convert-current-note', name: 'Предпросмотр и преобразование ссылок в текущей заметке',
+            id: 'convert-current-note', name: tr(this.settings, 'currentCommand'),
             editorCallback: (editor, view) => {
                 const file = view.file;
                 if (!file)
                     return;
                 const preview = transformText(editor.getValue(), file.path, this.app, this.settings);
                 if (!preview.changes) {
-                    new obsidian_1.Notice('Linker4Obsidian: изменений не требуется.');
+                    new obsidian_1.Notice(tr(this.settings, 'noChanges'));
                     return;
                 }
-                new ConfirmModal(this.app, 'Преобразовать ссылки в текущей заметке?', `Предлагается ${preview.changes} изменений. Текст в кодовых блоках и frontmatter пропускается.`, diffExamples(editor.getValue(), preview.text), async () => {
+                new ConfirmModal(this.app, tr(this.settings, 'currentTitle'), tr(this.settings, 'currentDescription', { count: preview.changes }), diffExamples(editor.getValue(), preview.text, this.settings), this.settings, async () => {
                     const fresh = transformText(editor.getValue(), file.path, this.app, this.settings);
                     if (fresh.changes) {
                         const previous = editor.getCursor();
                         editor.setValue(fresh.text);
                         editor.setCursor(previous);
-                        new obsidian_1.Notice(`Linker4Obsidian: применено ${fresh.changes} изменений.`);
+                        new obsidian_1.Notice(tr(this.settings, 'applied', { count: fresh.changes }));
                     }
                 }).open();
             }
         });
         this.addCommand({
-            id: 'convert-entire-vault', name: 'Предпросмотр и преобразование ссылок во всём хранилище',
+            id: 'convert-entire-vault', name: tr(this.settings, 'vaultCommand'),
             callback: async () => {
                 const files = this.app.vault.getMarkdownFiles();
                 const plans = [];
@@ -392,14 +493,14 @@ class Linker4ObsidianPlugin extends obsidian_1.Plugin {
                     const text = this.openEditor(file)?.getValue() ?? await this.app.vault.cachedRead(file);
                     const { changes, text: updated } = transformText(text, file.path, this.app, this.settings);
                     if (changes)
-                        plans.push({ file, count: changes, example: diffExamples(text, updated, 1)[0] || '' });
+                        plans.push({ file, count: changes, example: diffExamples(text, updated, this.settings, 1)[0] || '' });
                 }
                 const total = plans.reduce((n, p) => n + p.count, 0);
                 if (!total) {
-                    new obsidian_1.Notice('Linker4Obsidian: изменений не требуется.');
+                    new obsidian_1.Notice(tr(this.settings, 'noChanges'));
                     return;
                 }
-                new ConfirmModal(this.app, 'Преобразовать ссылки во всём хранилище?', `${total} изменений в ${plans.length} заметках. Перед массовой операцией рекомендуется резервная копия.`, plans.map(p => `${p.file.path} — ${p.count}; ${p.example}`), async () => {
+                new ConfirmModal(this.app, tr(this.settings, 'vaultTitle'), tr(this.settings, 'vaultDescription', { count: total, files: plans.length }), plans.map(p => `${p.file.path} — ${p.count}; ${p.example}`), this.settings, async () => {
                     let changed = 0, errors = 0;
                     for (const { file } of plans) {
                         try {
@@ -428,7 +529,7 @@ class Linker4ObsidianPlugin extends obsidian_1.Plugin {
                             console.error('Linker4Obsidian: failed on', file.path, e);
                         }
                     }
-                    new obsidian_1.Notice(`Linker4Obsidian: преобразовано ${changed} ссылок.${errors ? ` Ошибок: ${errors}.` : ''}`, 8000);
+                    new obsidian_1.Notice(tr(this.settings, 'vaultApplied', { count: changed, errors: errors ? tr(this.settings, 'vaultErrors', { count: errors }) : '' }), 8000);
                 }).open();
             }
         });
@@ -443,53 +544,61 @@ class LinkerSettingTab extends obsidian_1.PluginSettingTab {
     }
     display() {
         const { containerEl } = this;
+        const t = (key) => tr(this.plugin.settings, key);
         containerEl.empty();
         containerEl.createEl('h2', { text: 'Linker4Obsidian' });
-        new obsidian_1.Setting(containerEl).setName('Автоматическая обработка Wiki-ссылок')
-            .setDesc('При создании/вставке [[ссылки]] применяет правила типов файлов. Не изменяет весь документ при каждом вводе.')
-            .addToggle(t => t.setValue(this.plugin.settings.automaticWiki).onChange(async (v) => {
-            this.plugin.settings.automaticWiki = v;
+        new obsidian_1.Setting(containerEl).setName(t('language')).setDesc(t('languageDesc'))
+            .addDropdown(d => d.addOptions({
+            auto: t('languageAuto'), en: t('languageEnglish'), ru: t('languageRussian')
+        }).setValue(this.plugin.settings.language).onChange(async (value) => {
+            if (value !== 'auto' && value !== 'en' && value !== 'ru')
+                return;
+            this.plugin.settings.language = value;
+            await this.plugin.saveSettings();
+            this.display();
+            new obsidian_1.Notice(tr(this.plugin.settings, 'languageChanged'));
+        }));
+        new obsidian_1.Setting(containerEl).setName(t('automaticWiki')).setDesc(t('automaticWikiDesc'))
+            .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticWiki).onChange(async (value) => {
+            this.plugin.settings.automaticWiki = value;
             await this.plugin.saveSettings();
         }));
-        new obsidian_1.Setting(containerEl).setName('YouTube → встроенный плеер')
-            .setDesc('Преобразовывать одиночные YouTube URL и Markdown-ссылки при массовой обработке.')
-            .addToggle(t => t.setValue(this.plugin.settings.automaticYouTube).onChange(async (v) => {
-            this.plugin.settings.automaticYouTube = v;
+        new obsidian_1.Setting(containerEl).setName(t('automaticYouTube')).setDesc(t('automaticYouTubeDesc'))
+            .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticYouTube).onChange(async (value) => {
+            this.plugin.settings.automaticYouTube = value;
             await this.plugin.saveSettings();
         }));
-        new obsidian_1.Setting(containerEl).setName('Встраивать YouTube при Ctrl+V')
-            .setDesc('При вставке чистого URL ролика на YouTube использует ![](URL).')
-            .addToggle(t => t.setValue(this.plugin.settings.pasteYouTube).onChange(async (v) => {
-            this.plugin.settings.pasteYouTube = v;
+        new obsidian_1.Setting(containerEl).setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
+            .addToggle(toggle => toggle.setValue(this.plugin.settings.pasteYouTube).onChange(async (value) => {
+            this.plugin.settings.pasteYouTube = value;
             await this.plugin.saveSettings();
         }));
-        containerEl.createEl('h3', { text: 'Правила по типам файлов' });
+        containerEl.createEl('h3', { text: t('fileRules') });
         const labels = [
-            { cat: 'markdown', name: 'Заметки Markdown', desc: '.md, .markdown' },
-            { cat: 'image', name: 'Изображения', desc: EXTENSIONS.image.join(', ') },
-            { cat: 'pdf', name: 'PDF', desc: '.pdf' },
-            { cat: 'video', name: 'Видеофайлы', desc: EXTENSIONS.video.join(', ') },
-            { cat: 'audio', name: 'Аудиофайлы', desc: EXTENSIONS.audio.join(', ') },
-            { cat: 'other', name: 'Неизвестные типы', desc: 'По умолчанию обычная ссылка' }
+            { cat: 'markdown', name: 'markdown', desc: '.md, .markdown' },
+            { cat: 'image', name: 'image', desc: EXTENSIONS.image.join(', ') },
+            { cat: 'pdf', name: 'pdf', desc: '.pdf' },
+            { cat: 'video', name: 'video', desc: EXTENSIONS.video.join(', ') },
+            { cat: 'audio', name: 'audio', desc: EXTENSIONS.audio.join(', ') },
+            { cat: 'other', name: 'other', desc: t('otherDesc') }
         ];
         for (const { cat, name, desc } of labels) {
-            new obsidian_1.Setting(containerEl).setName(name).setDesc(desc)
-                .addDropdown(d => d.addOptions({ link: 'Обычная ссылка [[...]]', embed: 'Встроить ![[...]]' })
-                .setValue(this.plugin.settings.rules[cat]).onChange(async (v) => {
-                this.plugin.settings.rules[cat] = v;
+            new obsidian_1.Setting(containerEl).setName(t(name)).setDesc(desc)
+                .addDropdown(d => d.addOptions({ link: t('link'), embed: t('embed') })
+                .setValue(this.plugin.settings.rules[cat]).onChange(async (value) => {
+                this.plugin.settings.rules[cat] = value;
                 await this.plugin.saveSettings();
             }));
         }
-        containerEl.createEl('h3', { text: 'Дополнительные расширения' });
-        new obsidian_1.Setting(containerEl).setName('Всегда встраивать')
-            .setDesc('Расширения через запятую, например epub, tif. Работает только если Obsidian умеет отображать формат.')
-            .addText(t => t.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
-            .onChange(async (v) => { this.plugin.settings.additionalEmbedExtensions = v; await this.plugin.saveSettings(); }));
-        new obsidian_1.Setting(containerEl).setName('Всегда оставлять ссылкой')
-            .setDesc('Приоритет выше правила встраивания. Например zip, md.')
-            .addText(t => t.setPlaceholder('zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
-            .onChange(async (v) => { this.plugin.settings.additionalLinkExtensions = v; await this.plugin.saveSettings(); }));
-        containerEl.createEl('p', { text: 'Существующие ссылки изменяются только командами через палитру команд. Начните с резервной копии заметок.' });
+        containerEl.createEl('h3', { text: t('extraExtensions') });
+        new obsidian_1.Setting(containerEl).setName(t('alwaysEmbed')).setDesc(t('alwaysEmbedDesc'))
+            .addText(field => field.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
+            .onChange(async (value) => { this.plugin.settings.additionalEmbedExtensions = value; await this.plugin.saveSettings(); }));
+        new obsidian_1.Setting(containerEl).setName(t('alwaysLink')).setDesc(t('alwaysLinkDesc'))
+            .addText(field => field.setPlaceholder('zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
+            .onChange(async (value) => { this.plugin.settings.additionalLinkExtensions = value; await this.plugin.saveSettings(); }));
+        containerEl.createEl('p', { text: t('existingLinksHint') });
     }
 }
-exports.__test = { youtubeEmbed, transformText, linkBehavior, inInlineCode };
+/** Pure helpers exposed for automated regression tests. */
+exports.__test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, tr };

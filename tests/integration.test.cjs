@@ -3,10 +3,14 @@ const assert = require('node:assert/strict');
 const Module = require('node:module');
 const mockEvents = {};
 const commands = {};
+let uiLanguage = 'ru';
+let storedData = null;
+let settingTab;
 let updateCallback;
 class MockPlugin {
-  async loadData() { return null; }
-  addSettingTab() {}
+  async loadData() { return storedData; }
+  async saveData(data) { storedData = data; }
+  addSettingTab(tab) { settingTab = tab; }
   registerEditorExtension(handler) { updateCallback = handler; }
   registerEvent() {}
   addCommand(command) { commands[command.id] = command; }
@@ -17,7 +21,7 @@ class MockCM { static updateListener = { of(callback) { return callback; } }; }
 const orig = Module._load;
 Module._load = function(request, parent, main) {
   if (request === 'obsidian') return { Plugin: MockPlugin, MarkdownView: MockMarkdownView, PluginSettingTab: MockSettingTab,
-    Modal: class {}, Notice: class {}, Setting: class {}, App: class {}, Editor: class {}, TFile: class {} };
+    Modal: class {}, Notice: class {}, Setting: class {}, App: class {}, Editor: class {}, TFile: class {}, getLanguage: () => uiLanguage };
   if (request === '@codemirror/view') return { EditorView: MockCM };
   return orig.call(this, request, parent, main);
 };
@@ -43,6 +47,9 @@ const app = {
   assert.equal(typeof mockEvents['editor-paste'], 'function');
   assert.equal(typeof commands['convert-current-note'].editorCallback, 'function');
   assert.equal(typeof commands['convert-entire-vault'].callback, 'function');
+  assert.equal(plugin.settings.language, 'auto');
+  assert.match(commands['convert-current-note'].name, /Предпросмотр/);
+  assert.equal(typeof settingTab.display, 'function');
 
   // Simulate picking a file from Obsidian's [[autocomplete]]. In this case
   // autocomplete inserts only the filename; the closing ]] already exists.
@@ -86,5 +93,18 @@ const app = {
     getValue:()=> '```\n\n```', getCursor:()=>({line:1,ch:0}), replaceSelection:()=>{throw new Error('Should not insert')}
   });
   assert.equal(protectedPaste, false);
-  console.log('5 integration smoke tests passed.');
+  // Explicit language override persists for the next plugin load.
+  storedData = {language:'en'};
+  const enPlugin = new Linker4Obsidian();
+  enPlugin.app = app;
+  await enPlugin.onload();
+  assert.match(commands['convert-current-note'].name, /Preview/);
+  assert.equal(enPlugin.settings.language, 'en');
+  uiLanguage = 'en';
+  storedData = {language:'ru'};
+  const ruPlugin = new Linker4Obsidian();
+  ruPlugin.app = app;
+  await ruPlugin.onload();
+  assert.match(commands['convert-entire-vault'].name, /Предпросмотр/);
+  console.log('9 integration smoke tests passed.');
 })().catch(err=>{console.error(err);process.exitCode=1;});

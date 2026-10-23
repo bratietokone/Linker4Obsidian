@@ -112,7 +112,7 @@ Las incrustaciones intencionales se conservan. Se omiten bloques de código, có
 Requiere Node.js y npm. El código TypeScript está en `src/`, las traducciones en `src/locales/` y esbuild crea un único `main.js`.
 
 ```bash
-npm install
+npm ci
 npm run typecheck
 npm run build
 npm test

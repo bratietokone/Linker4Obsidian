@@ -7,13 +7,16 @@
     "build": "node scripts/build.cjs",
     "test": "node tests/linker.test.cjs && node tests/integration.test.cjs && node tests/external-links.test.cjs",
     "typecheck": "tsc --noEmit --skipLibCheck -p tsconfig.json",
-    "validate": "node scripts/validate-manifest.cjs"
+    "validate": "node scripts/validate-manifest.cjs",
+    "lint": "eslint src/main.ts src/externalLinks.ts --quiet"
   },
   "devDependencies": {
     "obsidian": "^1.14.4",
     "@codemirror/view": "^6.38.0",
     "typescript": "5.8.3",
     "esbuild": "^0.25.12",
-    "@types/node": "^22.15.3"
+    "@types/node": "^22.15.3",
+    "eslint": "^9.39.1",
+    "eslint-plugin-obsidianmd": "^0.4.2"
   }
 }

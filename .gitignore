@@ -1,3 +1,32 @@
 node_modules/
 build/
+dist/
+coverage/
+.nyc_output/
+.cache/
+
+# Local editor and Obsidian vault data
+**/.obsidian/
+data.json
+
+# Environment, credentials and private keys
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+id_rsa*
+id_ed25519*
+
+# Generated/debug files
+*.log
+npm-debug.log*
+*.tmp
+*.sqlite
+*.sqlite3
+*.db
+*.zip
 .DS_Store
+Thumbs.db

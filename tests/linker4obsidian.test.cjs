@@ -71,6 +71,14 @@ const tests = [
   () => assert.equal(__test.resolvedLocale({ ...defaults, language: 'ru' }), 'ru'),
   () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'apply'), 'Apply'),
   () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'apply'), 'Применить'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'es' }, 'apply'), 'Aplicar'),
+  () => assert.equal(__test.tr({ ...defaults, language: 'zh-CN' }, 'apply'), '应用'),
+  () => assert.equal(__test.resolvedLocale({ ...defaults, language: 'es' }), 'es'),
+  () => assert.equal(__test.resolvedLocale({ ...defaults, language: 'zh-CN' }), 'zh-CN'),
+  () => assert.equal(__test.localeFromLanguage('es-MX'), 'es'),
+  () => assert.equal(__test.localeFromLanguage('zh-Hans'), 'zh-CN'),
+  () => assert.equal(__test.localeFromLanguage('zh-TW'), 'en'),
+  () => assert.equal(__test.localeFromLanguage('de-DE'), 'en'),
   () => assert.equal(__test.tr({ ...defaults, language: 'ru' }, 'applied', { count: 3 }), 'Linker4Obsidian: применено 3 изменений.'),
   () => assert.equal(__test.tr({ ...defaults, language: 'en' }, 'applied', { count: 3 }), 'Linker4Obsidian: applied 3 changes.')
 ];

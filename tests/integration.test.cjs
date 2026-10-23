@@ -106,5 +106,16 @@ const app = {
   ruPlugin.app = app;
   await ruPlugin.onload();
   assert.match(commands['convert-entire-vault'].name, /Предпросмотр/);
-  console.log('9 integration smoke tests passed.');
+  // New language preferences persist across plugin loads and affect commands.
+  storedData = { language: 'es' };
+  const esPlugin = new Linker4Obsidian();
+  esPlugin.app = app;
+  await esPlugin.onload();
+  assert.match(commands['convert-current-note'].name, /Vista previa/);
+  storedData = { language: 'zh-CN' };
+  const zhPlugin = new Linker4Obsidian();
+  zhPlugin.app = app;
+  await zhPlugin.onload();
+  assert.match(commands['convert-entire-vault'].name, /预览/);
+  console.log('11 integration smoke tests passed.');
 })().catch(err=>{console.error(err);process.exitCode=1;});

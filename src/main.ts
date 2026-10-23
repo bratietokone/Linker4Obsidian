@@ -3,12 +3,11 @@ import {
   Setting, TFile, getLanguage
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
+import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
 type Behavior = 'link' | 'embed';
 type Category = 'markdown' | 'image' | 'pdf' | 'video' | 'audio' | 'other';
 type Rules = Record<Category, Behavior>;
-type LanguagePreference = 'auto' | 'en' | 'ru';
-type UiLocale = 'en' | 'ru';
 
 interface LinkerSettings {
   language: LanguagePreference;
@@ -30,102 +29,9 @@ const DEFAULT_SETTINGS: LinkerSettings = {
   additionalLinkExtensions: ''
 };
 
-/** UI strings only: generated Markdown and note content are never translated. */
-const EN = {
-  language: 'Interface language',
-  languageDesc: 'Choose the language for Linker4Obsidian independently of Obsidian.',
-  languageAuto: 'Automatic (Obsidian language)',
-  languageEnglish: 'English',
-  languageRussian: 'Русский',
-  languageChanged: 'Settings language updated. Reload the plugin to update command palette names.',
-  automaticWiki: 'Automatically process Wiki-links',
-  automaticWikiDesc: 'Apply file-type rules to newly created or pasted [[links]], without rewriting the entire document.',
-  automaticYouTube: 'YouTube → embedded player',
-  automaticYouTubeDesc: 'Convert standalone YouTube URLs and Markdown links when processing existing notes.',
-  pasteYouTube: 'Embed YouTube on paste',
-  pasteYouTubeDesc: 'Insert ![](URL) when a YouTube video URL is pasted into an eligible line.',
-  fileRules: 'File type rules',
-  markdown: 'Markdown notes',
-  image: 'Images',
-  pdf: 'PDF files',
-  video: 'Video files',
-  audio: 'Audio files',
-  other: 'Unknown file types',
-  otherDesc: 'Normal links by default',
-  link: 'Link [[...]]',
-  embed: 'Embed ![[...]]',
-  extraExtensions: 'Additional extensions',
-  alwaysEmbed: 'Always embed',
-  alwaysEmbedDesc: 'Comma-separated extensions such as epub, tif. The file can be displayed only if Obsidian supports it.',
-  alwaysLink: 'Always link',
-  alwaysLinkDesc: 'Takes priority over embed rules. For example: zip, md.',
-  existingLinksHint: 'Existing links are changed only through command palette actions. Back up your notes first.',
-  currentCommand: 'Preview and convert links in current note',
-  vaultCommand: 'Preview and convert links in entire vault',
-  currentTitle: 'Convert links in the current note?',
-  vaultTitle: 'Convert links in the entire vault?',
-  currentDescription: '{count} changes proposed. Code fences and frontmatter will be skipped.',
-  vaultDescription: '{count} changes in {files} notes. Back up your vault before a bulk operation.',
-  noChanges: 'Linker4Obsidian: no changes needed.',
-  applied: 'Linker4Obsidian: applied {count} changes.',
-  vaultApplied: 'Linker4Obsidian: converted {count} links.{errors}',
-  vaultErrors: ' Errors: {count}.',
-  modalError: 'Linker4Obsidian: conversion failed. Check the developer console.',
-  lineExample: 'Line {line}: {before} → {after}',
-  moreExamples: '...and {count} more',
-  cancel: 'Cancel',
-  apply: 'Apply'
-} as const;
-type TranslationKey = keyof typeof EN;
-const RU: Record<TranslationKey, string> = {
-  language: 'Язык интерфейса',
-  languageDesc: 'Язык Linker4Obsidian можно выбрать независимо от языка Obsidian.',
-  languageAuto: 'Автоматически (язык Obsidian)',
-  languageEnglish: 'English',
-  languageRussian: 'Русский',
-  languageChanged: 'Язык настроек изменён. Перезагрузите плагин, чтобы обновить названия команд в палитре.',
-  automaticWiki: 'Автоматическая обработка Wiki-ссылок',
-  automaticWikiDesc: 'Применяет правила типов файлов к новым или вставленным [[ссылкам]], не переписывая весь документ.',
-  automaticYouTube: 'YouTube → встроенный плеер',
-  automaticYouTubeDesc: 'Преобразовывать одиночные YouTube URL и Markdown-ссылки при обработке существующих заметок.',
-  pasteYouTube: 'Встраивать YouTube при вставке',
-  pasteYouTubeDesc: 'При вставке URL ролика на YouTube в подходящую строку используется ![](URL).',
-  fileRules: 'Правила по типам файлов',
-  markdown: 'Заметки Markdown',
-  image: 'Изображения',
-  pdf: 'PDF-файлы',
-  video: 'Видеофайлы',
-  audio: 'Аудиофайлы',
-  other: 'Неизвестные типы',
-  otherDesc: 'По умолчанию обычная ссылка',
-  link: 'Обычная ссылка [[...]]',
-  embed: 'Встроить ![[...]]',
-  extraExtensions: 'Дополнительные расширения',
-  alwaysEmbed: 'Всегда встраивать',
-  alwaysEmbedDesc: 'Расширения через запятую, например epub, tif. Формат должен поддерживаться Obsidian.',
-  alwaysLink: 'Всегда оставлять ссылкой',
-  alwaysLinkDesc: 'Приоритет выше правила встраивания. Например zip, md.',
-  existingLinksHint: 'Существующие ссылки изменяются только командами через палитру команд. Начните с резервной копии заметок.',
-  currentCommand: 'Предпросмотр и преобразование ссылок в текущей заметке',
-  vaultCommand: 'Предпросмотр и преобразование ссылок во всём хранилище',
-  currentTitle: 'Преобразовать ссылки в текущей заметке?',
-  vaultTitle: 'Преобразовать ссылки во всём хранилище?',
-  currentDescription: 'Предлагается {count} изменений. Текст в кодовых блоках и frontmatter пропускается.',
-  vaultDescription: '{count} изменений в {files} заметках. Перед массовой операцией рекомендуется резервная копия.',
-  noChanges: 'Linker4Obsidian: изменений не требуется.',
-  applied: 'Linker4Obsidian: применено {count} изменений.',
-  vaultApplied: 'Linker4Obsidian: преобразовано {count} ссылок.{errors}',
-  vaultErrors: ' Ошибок: {count}.',
-  modalError: 'Linker4Obsidian: ошибка преобразования. Проверьте консоль.',
-  lineExample: 'Строка {line}: {before} → {after}',
-  moreExamples: '...и ещё {count}',
-  cancel: 'Отмена',
-  apply: 'Применить'
-};
-const TRANSLATIONS: Record<UiLocale, Record<TranslationKey, string>> = { en: EN, ru: RU };
+/** Only interface text is localized; generated note content is never translated. */
 function resolvedLocale(settings: LinkerSettings): UiLocale {
-  const lang = settings.language === 'auto' ? getLanguage() : settings.language;
-  return lang.toLowerCase().split(/[-_]/)[0] === 'ru' ? 'ru' : 'en';
+  return localeFromLanguage(settings.language === 'auto' ? getLanguage() : settings.language);
 }
 function tr(settings: LinkerSettings, key: TranslationKey, params: Record<string, string | number> = {}): string {
   return TRANSLATIONS[resolvedLocale(settings)][key].replace(/\{(\w+)\}/g, (match, name: string) =>
@@ -504,9 +410,10 @@ class LinkerSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Linker4Obsidian' });
     new Setting(containerEl).setName(t('language')).setDesc(t('languageDesc'))
       .addDropdown(d => d.addOptions({
-        auto: t('languageAuto'), en: t('languageEnglish'), ru: t('languageRussian')
+        auto: t('languageAuto'), en: t('languageEnglish'), ru: t('languageRussian'),
+        es: t('languageSpanish'), 'zh-CN': t('languageChinese')
       }).setValue(this.plugin.settings.language).onChange(async (value) => {
-        if (value !== 'auto' && value !== 'en' && value !== 'ru') return;
+        if (!['auto', 'en', 'ru', 'es', 'zh-CN'].includes(value)) return;
         this.plugin.settings.language = value;
         await this.plugin.saveSettings();
         this.display();
@@ -556,4 +463,4 @@ class LinkerSettingTab extends PluginSettingTab {
 }
 
 /** Pure helpers exposed for automated regression tests. */
-export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, tr };
+export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr };

@@ -433,7 +433,7 @@ export default class Linker4ObsidianPlugin extends Plugin {
 
     this.addCommand({
       id: 'convert-current-note', name: tr(this.settings, 'currentCommand'),
-      editorCallback: (editor: Editor, view: MarkdownView) => {
+      editorCallback: (editor: Editor, view) => {
         const file = view.file;
         if (!file) return;
         const preview = transformText(editor.getValue(), file.path, this.app, this.settings);

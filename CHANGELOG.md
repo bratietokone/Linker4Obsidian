@@ -11,6 +11,7 @@ All notable changes to Linker4Obsidian are recorded here. / Здесь фикс�
 - Added English and Russian README files, with universal installation instructions for Windows, macOS, and Linux.
 - Retained existing link-processing behavior and settings compatibility with 0.1.0.
 - Added a formal changelog and GitHub release packaging (including a ZIP and individual plugin files).
+- Fixed TypeScript editor command signature compatibility with the Obsidian API.
 
 ### Русский
 
@@ -19,6 +20,7 @@ All notable changes to Linker4Obsidian are recorded here. / Здесь фикс�
 - Подготовлена документация на английском и русском языках с универсальной установкой для Windows, macOS и Linux.
 - Сохранены прежние правила ссылок и совместимость настроек с 0.1.0.
 - Добавлены журнал изменений и упаковка релиза GitHub (ZIP и отдельные файлы плагина).
+- Исправлена совместимость сигнатуры команды редактора с типами API Obsidian.
 
 ## [0.1.0] - 2026-10-23
 

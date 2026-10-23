@@ -1,5 +1,6 @@
 import { App, Editor, Modal, Notice, Setting } from 'obsidian';
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate, WidgetType } from '@codemirror/view';
+import type { Range } from '@codemirror/state';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -130,6 +131,8 @@ export class ExternalInsertModal extends Modal {
     contentEl.createEl('h2', { text: this.t(this.kind === 'file' ? 'externalInsertFile' : 'externalInsertFolder') });
     contentEl.createEl('p', { text: this.t('externalInsertHint') });
     let updatePath: (next: string) => void = () => {};
+    let nameField: { setValue: (value: string) => unknown } | undefined;
+    let pathField: { setValue: (value: string) => unknown } | undefined;
     new Setting(contentEl).setName(this.t('externalPath')).addText(input => {
       input.setPlaceholder(this.kind === 'file' ? '/home/user/Documents/report.pdf' : '/home/user/Projects')
         .setValue(this.selectedPath)
@@ -143,8 +146,6 @@ export class ExternalInsertModal extends Modal {
       // Keep a reference so the browse button updates this same input.
       pathField = input;
     });
-    let nameField: { setValue: (value: string) => unknown } | undefined;
-    let pathField: { setValue: (value: string) => unknown } | undefined;
     new Setting(contentEl).setName(this.t('externalDisplayName')).addText(input => {
       nameField = input;
       input.setPlaceholder(this.t('externalDisplayPlaceholder'))
@@ -225,7 +226,7 @@ export function getExternalEditorExtension(config: () => ExternalConfig, t: Tran
   }
   const build = (view: EditorView): DecorationSet => {
     if (!config().externalEnabled) return Decoration.none;
-    const decorations: ReturnType<typeof Decoration.replace>[] = [];
+    const decorations: Range<Decoration>[] = [];
     const cursor = view.state.selection.main.head;
     for (const range of view.visibleRanges) {
       const matches = collectLinks(view.state.doc.sliceString(range.from, range.to), range.from);

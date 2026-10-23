@@ -4,7 +4,7 @@
 
 A desktop [Obsidian](https://obsidian.md/) community plugin that automatically embeds supported attachments while keeping Markdown notes as ordinary Wiki-links. It can also turn standalone YouTube video URLs into embedded players.
 
-**Version:** 0.2.0 · **Status:** Pre-release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
+**Version:** 0.2.0 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
 
 ## Features
 
@@ -21,9 +21,9 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 
 The installation process is the same on every supported desktop operating system. **This version requires manual installation**, because it has not been accepted into the official Obsidian directory.
 
-1. Open the [Linker4Obsidian repository](https://github.com/bratietokone/Linker4Obsidian) (repository access may be required while it is private). Download these two files from the repository root: [`manifest.json`](manifest.json) and [`main.js`](main.js). Use the **Raw** / **Download raw file** option, not *Save webpage as*.
+1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) (access is required while the repository is private). From the release **Assets**, download both `main.js` and `manifest.json`, or download `linker4obsidian-vX.Y.Z.zip` and extract it.
 2. Open the **vault** you want to use, not Obsidian's application installation directory. Find or create its hidden `.obsidian/plugins/linker4obsidian/` folder.
-3. Copy both files into that folder, preserving their original names:
+3. Place both files in that folder, preserving their original names. If using the ZIP, it already includes a `linker4obsidian/` folder, which should sit inside `.obsidian/plugins/`:
 
    ```text
    YourVault/
@@ -46,14 +46,6 @@ The installation process is the same on every supported desktop operating system
 | Linux | `/home/<you>/Documents/MyVault/.obsidian/plugins/linker4obsidian/` | In most file managers press **Ctrl+H** to show hidden files. |
 
 These are **examples**, not fixed locations. Your vault may be anywhere, including another drive or a synced folder. The `.obsidian` directory is inside the vault. Avoid an extra nesting level such as `linker4obsidian/linker4obsidian/`.
-
-### Updating from 0.1.0
-
-1. Disable Linker4Obsidian or close Obsidian.
-2. Replace **both** `manifest.json` and `main.js` in the existing `.obsidian/plugins/linker4obsidian/` folder with the latest versions from the repository.
-3. Re-enable/restart the plugin. Your rules and settings in `data.json` remain intact. The language setting defaults to **Automatic** until you choose another option.
-
-Do **not** delete `data.json` during an update. Linker4Obsidian is a different plugin ID from the original Smart Embed prototype (`linker4obsidian` vs. `smart-embed`).
 
 ## Interface language
 
@@ -113,6 +105,9 @@ npm test
 GitHub Actions runs the same checks on pushes and pull requests. The plugin uses TypeScript and Obsidian's editor API; no external runtime packages or network requests are required.
 
 ## Feedback and license
+
+- [Releases](https://github.com/bratietokone/Linker4Obsidian/releases)
+- [Changelog](CHANGELOG.md)
 
 - [Repository](https://github.com/bratietokone/Linker4Obsidian)
 - [Report a bug or request a feature](https://github.com/bratietokone/Linker4Obsidian/issues)

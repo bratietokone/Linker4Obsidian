@@ -1,0 +1,21 @@
+name: Diagnose Obsidian scanner (temporary)
+on:
+  push:
+    branches: [diagnostics/obsidian-scanner-fatal]
+    paths:
+      - scanner-test.config.mjs
+      - .github/workflows/scan-diagnostic.yml
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check scanner-equivalent lint across all files including main.js
+        run: npx eslint . --config scanner-test.config.mjs --quiet
+      - name: Check main.js in isolation
+        run: npx eslint main.js --config scanner-test.config.mjs --quiet

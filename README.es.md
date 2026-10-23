@@ -4,7 +4,7 @@
 
 Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian.md/). Mantiene los enlaces a notas Markdown como enlaces Wiki normales e incrusta automáticamente los archivos adjuntos compatibles. También convierte URL de vídeos de YouTube en reproductores integrados.
 
-**Versión:** 0.3.0 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
+**Versión:** 0.4.0 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
 
 ## Funciones
 
@@ -68,7 +68,7 @@ Los ajustes, notificaciones y diálogos cambian inmediatamente. Para actualizar 
 
 Las reglas por categoría y las extensiones adicionales son configurables. **Usar siempre un enlace** tiene prioridad sobre **Incrustar siempre**. La vista previa depende de los formatos compatibles con Obsidian.
 
-## Archivos y carpetas externos (versión de desarrollo)
+## Archivos y carpetas externos
 
 En **Configuración → Linker4Obsidian → Archivos y carpetas externos** hay una página independiente. Activa los enlaces externos y elige Markdown o Wiki para crear enlaces nuevos; ambos formatos siguen funcionando.
 
@@ -84,7 +84,7 @@ Desde la paleta de comandos utiliza **Insertar enlace a archivo externo** o **In
 
 Los enlaces se abren en el modo de lectura o Live Preview mediante la aplicación predeterminada o el gestor de archivos; también puedes elegir mostrar el destino en su carpeta. Los ejecutables nunca se lanzan automáticamente. Los archivos no encontrados muestran un aviso. No se admiten anfitriones de archivos remotos ni otros esquemas.
 
-**Nota:** función de desarrollo todavía no incluida en la versión estable v0.3.0. No incrusta ni copia adjuntos externos y no cambia el tratamiento de adjuntos de la bóveda.
+**Nota:** no incrusta ni copia archivos externos y no modifica el tratamiento de los adjuntos de la bóveda.
 
 ## Uso
 

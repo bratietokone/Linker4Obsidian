@@ -4,9 +4,13 @@
 
 Principales cambios de Linker4Obsidian.
 
-## [Sin publicar]
+## [0.4.0] - 2026-10-23
 
-- En desarrollo: enlaces a archivos y carpetas externos en formatos Markdown (`file:///`) y Wiki (`external:`), con página de configuración y comandos propios.
+- Se añadieron enlaces a archivos y carpetas fuera de la bóveda en formatos Markdown (`file:///`) y Wiki (`[[external:...|nombre]]`).
+- Se añadió una pestaña independiente de **Archivos y carpetas externos** para elegir el formato y el modo de apertura.
+- Se añadieron comandos para insertar enlaces mediante el selector de archivos o introduciendo una ruta absoluta.
+- Los enlaces se pueden abrir con la aplicación o gestor predeterminado, con avisos para rutas ausentes y protección ante ejecutables.
+- No cambiaron las reglas de adjuntos internos, enlaces Wiki ni YouTube. Interfaz y documentación en cuatro idiomas.
 
 ## [0.3.0] - 2026-10-23
 

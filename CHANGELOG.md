@@ -4,9 +4,13 @@
 
 All notable changes to Linker4Obsidian are documented here.
 
-## [Unreleased]
+## [0.4.0] - 2026-10-23
 
-- In development: external file and folder links in Markdown (`file:///`) and Wiki (`external:`) formats, with a separate settings page and new insert commands.
+- Added links to files and folders outside the vault in both Markdown (`file:///`) and Wiki (`[[external:...|name]]`) formats.
+- Added separate **External files and folders** settings page with configurable default link format and open/reveal behavior.
+- Added commands to insert external file and folder links, with a file picker and manual path entry.
+- Added opening of external targets in the system default application or file manager, with missing-path warnings and safe handling of executable files.
+- Kept internal vault attachment, Wiki-link and YouTube behaviors unchanged. UI and documentation support all four languages.
 
 ## [0.3.0] - 2026-10-23
 

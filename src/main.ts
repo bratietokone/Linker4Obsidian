@@ -530,10 +530,10 @@ class LinkerSettingTab extends PluginSettingTab {
     }
     new Setting(containerEl).setName(t('extraExtensions')).setHeading();
     new Setting(containerEl).setName(t('alwaysEmbed')).setDesc(t('alwaysEmbedDesc'))
-      .addText(field => field.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
+      .addText(field => field.setPlaceholder('Epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
         .onChange(async value => { this.plugin.settings.additionalEmbedExtensions = value; await this.plugin.saveSettings(); }));
     new Setting(containerEl).setName(t('alwaysLink')).setDesc(t('alwaysLinkDesc'))
-      .addText(field => field.setPlaceholder('zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
+      .addText(field => field.setPlaceholder('Zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
         .onChange(async value => { this.plugin.settings.additionalLinkExtensions = value; await this.plugin.saveSettings(); }));
     containerEl.createEl('p', { text: t('existingLinksHint') });
   }

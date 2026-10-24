@@ -7,12 +7,12 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 function getElectron(): unknown {
   // Electron is provided by Obsidian. The dynamic load stays isolated here.
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Runtime Electron modules are not npm dependencies
   return require('electron') as unknown;
 }
 function getRemote(): unknown {
   // Optional compatibility fallback (not part of the packaged plugin).
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Runtime Electron modules are not npm dependencies
   return require('@electron/remote') as unknown;
 }
 function asShell(value: unknown): NativeShell | null {
@@ -57,5 +57,5 @@ export async function pickLocalPath(kind: 'file' | 'directory'): Promise<string 
       !Array.isArray(result.filePaths) || !result.filePaths.every(file => typeof file === 'string')) {
     throw new Error('Unexpected response from the native file picker');
   }
-  return result.canceled ? null : (result.filePaths[0] as string | undefined) ?? null;
+  return result.canceled ? null : result.filePaths[0] ?? null;
 }

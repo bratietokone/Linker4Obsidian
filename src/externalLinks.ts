@@ -6,6 +6,11 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+/** Reject URI control characters (including NUL) before accessing the filesystem. */
+function invalidControlChars(text: string): boolean {
+  return [...text].some(char => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127);
+}
+
 export type ExternalFormat = 'markdown' | 'wiki';
 export type ExternalOpenMode = 'open' | 'reveal';
 export type ExternalKind = 'file' | 'directory';
@@ -24,7 +29,7 @@ export function resolveExternalTarget(target: string): string | null {
     let candidate: string;
     try { candidate = decodeURIComponent(value.slice('external:'.length)); }
     catch { return null; }
-    if (/[\u0000-\u001f\u007f]/.test(candidate) || /^(?:\\\\|\/\/)/.test(candidate)) return null;
+    if (invalidControlChars(candidate) || /^(?:\\\\|\/\/)/.test(candidate)) return null;
     const normalized = path.normalize(candidate);
     return path.isAbsolute(normalized) ? normalized : null;
   }
@@ -34,7 +39,7 @@ export function resolveExternalTarget(target: string): string | null {
     if (url.protocol !== 'file:' || (url.hostname && url.hostname !== 'localhost') ||
         url.search || url.hash) return null;
     const filename = fileURLToPath(url);
-    if (/[\u0000-\u001f\u007f]/.test(filename) || /^(?:\\\\|\/\/)/.test(filename)) return null;
+    if (invalidControlChars(filename) || /^(?:\\\\|\/\/)/.test(filename)) return null;
     return path.isAbsolute(filename) ? path.normalize(filename) : null;
   } catch { return null; }
 }

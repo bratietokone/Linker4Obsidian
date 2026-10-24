@@ -18,7 +18,7 @@ jobs:
         shell: bash
         run: |
           npm audit --json > npm-audit-report.json || true
-          node -e 'const a=require("./npm-audit-report.json");console.log("Dependency audit:", JSON.stringify(a.metadata?.vulnerabilities ?? a.error ?? {}))'
+          node -e 'const a=require("./npm-audit-report.json");console.log("Dependency audit:", JSON.stringify(a.metadata?.vulnerabilities ?? a.error ?? {}));for(const [name,v] of Object.entries(a.vulnerabilities??{})) console.log("Audit package:", JSON.stringify({name,severity:v.severity,isDirect:v.isDirect,fixAvailable:v.fixAvailable,via:v.via?.map(x=>typeof x==="string"?x:x.name)}))'
       - uses: actions/upload-artifact@v4
         with:
           name: linker-dependency-audit

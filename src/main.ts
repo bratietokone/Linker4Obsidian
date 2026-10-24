@@ -3,9 +3,10 @@ import {
   Setting, TFile, getLanguage
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, pickLocalPath,
+import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki,
   getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget, collectRenderableExternalLinks,
   type ExternalFormat, type ExternalOpenMode } from './externalLinks';
+import { pickLocalPath } from './externalPlatform';
 import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
 type Behavior = 'link' | 'embed';

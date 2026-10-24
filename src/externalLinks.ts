@@ -194,28 +194,30 @@ export function collectRenderableExternalLinks(text: string): ExternalMatch[] {
   let fence: { char: string; width: number } | null = null;
   let comment = false;
   for (let n = 0; n < lines.length; n++) {
-    const line = lines[n].replace(/\r?\n$/, '');
+    const sourceLine = lines[n];
+    if (sourceLine === undefined) continue;
+    const line = sourceLine.replace(/\r?\n$/, '');
     const trimmed = line.trim();
     if (n === 0 && (trimmed === '---' || trimmed === '+++')) {
       frontmatter = true;
-      offset += lines[n].length;
+      offset += sourceLine.length;
       continue;
     }
     if (frontmatter) {
       if (trimmed === '---' || trimmed === '+++' || trimmed === '...') frontmatter = false;
-      offset += lines[n].length;
+      offset += sourceLine.length;
       continue;
     }
     const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line);
     if (fence) {
       if (marker && marker[1][0] === fence.char && marker[1].length >= fence.width &&
           line.slice(marker[0].length).trim() === '') fence = null;
-      offset += lines[n].length;
+      offset += sourceLine.length;
       continue;
     }
     if (marker) {
       fence = { char: marker[1][0], width: marker[1].length };
-      offset += lines[n].length;
+      offset += sourceLine.length;
       continue;
     }
     let masked = '', inlineTicks = 0;
@@ -246,7 +248,7 @@ export function collectRenderableExternalLinks(text: string): ExternalMatch[] {
       i++;
     }
     result.push(...collectLinks(masked, offset));
-    offset += lines[n].length;
+    offset += sourceLine.length;
   }
   return result;
 }

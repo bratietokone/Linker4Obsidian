@@ -258,6 +258,7 @@ class ConfirmModal extends Modal {
 export default class LinkerPlugin extends Plugin {
   settings: LinkerSettings = DEFAULT_SETTINGS;
   private applying = new WeakSet<EditorView>();
+  private refreshExternalLinks: () => void = () => {};
 
   private openEditor(file: TFile): Editor | null {
     for (const leaf of this.app.workspace.getLeavesOfType('markdown')) {
@@ -273,7 +274,9 @@ export default class LinkerPlugin extends Plugin {
     this.addSettingTab(new LinkerSettingTab(this.app, this));
     const externalTranslate = (key: string, params: Record<string, string | number> = {}) =>
       tr(this.settings, key as TranslationKey, params);
-    this.registerEditorExtension(getExternalEditorExtension(() => this.settings, externalTranslate));
+    const externalLinks = getExternalEditorExtension(() => this.settings, externalTranslate);
+    this.registerEditorExtension(externalLinks.extension);
+    this.refreshExternalLinks = externalLinks.refresh;
     if (typeof document !== 'undefined') {
       this.registerDomEvent(document, 'click', (event: MouseEvent) =>
         handleExternalAnchorClick(event, this.settings, externalTranslate), true);
@@ -435,6 +438,7 @@ export default class LinkerPlugin extends Plugin {
       }
     });
   }
+  refreshExternalLinkViews(): void { this.refreshExternalLinks(); }
   async saveSettings(): Promise<void> { await this.saveData(this.settings); }
 }
 
@@ -461,6 +465,7 @@ class LinkerSettingTab extends PluginSettingTab {
       new Setting(containerEl).setName(t('externalEnabled')).setDesc(t('externalEnabledDesc'))
         .addToggle(toggle => toggle.setValue(this.plugin.settings.externalEnabled).onChange(async value => {
           this.plugin.settings.externalEnabled = value;
+          this.plugin.refreshExternalLinkViews();
           await this.plugin.saveSettings();
         }));
       new Setting(containerEl).setName(t('externalFormat')).setDesc(t('externalFormatDesc'))

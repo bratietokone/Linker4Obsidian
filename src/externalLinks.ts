@@ -1,4 +1,5 @@
 import { App, Editor, Modal, Notice, Setting } from 'obsidian';
+import { pickLocalPath, openLocalPath, revealLocalPath } from './externalPlatform';
 import { Decoration, DecorationSet, EditorView, ViewPlugin, ViewUpdate, WidgetType } from '@codemirror/view';
 import type { Range } from '@codemirror/state';
 import * as fs from 'node:fs';
@@ -23,14 +24,17 @@ export function resolveExternalTarget(target: string): string | null {
     let candidate: string;
     try { candidate = decodeURIComponent(value.slice('external:'.length)); }
     catch { return null; }
+    if (/[\u0000-\u001f\u007f]/.test(candidate) || /^(?:\\\\|\/\/)/.test(candidate)) return null;
     const normalized = path.normalize(candidate);
     return path.isAbsolute(normalized) ? normalized : null;
   }
   if (!/^file:\/\//i.test(value)) return null;
   try {
     const url = new URL(value);
-    if (url.protocol !== 'file:' || (url.hostname && url.hostname !== 'localhost')) return null;
+    if (url.protocol !== 'file:' || (url.hostname && url.hostname !== 'localhost') ||
+        url.search || url.hash) return null;
     const filename = fileURLToPath(url);
+    if (/[\u0000-\u001f\u007f]/.test(filename) || /^(?:\\\\|\/\/)/.test(filename)) return null;
     return path.isAbsolute(filename) ? path.normalize(filename) : null;
   } catch { return null; }
 }
@@ -65,7 +69,7 @@ export function readExternalLinkFromWiki(value: string): { target: string; label
 }
 
 export function isExecutablePath(filename: string): boolean {
-  return /\.(exe|com|bat|cmd|ps1|sh|desktop|app|appimage|command|bin|msi|scr|jar|run|lnk|url)$/i.test(filename);
+  return /\.(exe|com|bat|cmd|ps1|sh|desktop|app|appimage|command|bin|msi|scr|jar|run|lnk|url|vbs|vbe|wsf|hta|reg|scpt|applescript)$/i.test(filename);
 }
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -73,53 +77,22 @@ type Translate = (key: string, params?: Record<string, string | number>) => stri
 export async function openExternalTarget(target: string, mode: ExternalOpenMode, t: Translate): Promise<void> {
   const filename = resolveExternalTarget(target);
   if (!filename) { new Notice(t('externalInvalidPath')); return; }
-  let isDirectory: boolean;
   let isExecutable: boolean;
   try {
     const stat = await fs.promises.stat(filename);
-    isDirectory = stat.isDirectory();
-    isExecutable = isExecutablePath(filename) ||
-      (!isDirectory && process.platform !== 'win32' && (stat.mode & 0o111) !== 0);
+    const realPath = await fs.promises.realpath(filename);
+    isExecutable = isExecutablePath(filename) || isExecutablePath(realPath) ||
+      (!stat.isDirectory() && process.platform !== 'win32' && (stat.mode & 0o111) !== 0);
+  } catch {
+    new Notice(t('externalMissing', { path: filename }));
+    return;
   }
-  catch { new Notice(t('externalMissing', { path: filename })); return; }
   try {
-    const shell = (require('electron') as { shell?: {
-      openPath: (file: string) => Promise<string>;
-      showItemInFolder: (file: string) => void;
-    }}).shell;
-    if (!shell) throw new Error('Electron shell is unavailable');
-    // Never execute potentially executable files: only reveal them to the user.
-    if (mode === 'reveal' || isExecutable) {
-      shell.showItemInFolder(filename);
-    } else {
-      const error = await shell.openPath(filename);
-      if (error) throw new Error(error);
-    }
+    if (mode === 'reveal' || isExecutable) await revealLocalPath(filename);
+    else await openLocalPath(filename);
   } catch (error) {
     console.error('Linker: cannot open external file', error);
     new Notice(t('externalOpenFailed'));
-  }
-}
-
-async function chooseNativePath(kind: ExternalKind): Promise<string | null> {
-  try {
-    let remote: { dialog?: { showOpenDialog: (options: {
-      properties: string[];
-    }) => Promise<{ canceled: boolean; filePaths: string[] }> } } | undefined;
-    try { remote = (require('electron') as { remote?: typeof remote }).remote; }
-    catch { /* Electron is unavailable in this environment. */ }
-    if (!remote?.dialog) {
-      try { remote = require('@electron/remote') as typeof remote; }
-      catch { /* Older or sandboxed builds may not provide a native dialog. */ }
-    }
-    if (!remote?.dialog) return null;
-    const result = await remote.dialog.showOpenDialog({
-      properties: [kind === 'file' ? 'openFile' : 'openDirectory']
-    });
-    return result.canceled ? null : (result.filePaths[0] || null);
-  } catch (error) {
-    console.error('Linker: native picker failed', error);
-    return null;
   }
 }
 
@@ -162,7 +135,7 @@ export class ExternalInsertModal extends Modal {
     });
     new Setting(contentEl)
       .addButton(button => button.setButtonText(this.t('externalBrowse')).onClick(async () => {
-        const selected = await chooseNativePath(this.kind);
+        const selected = await pickLocalPath(this.kind);
         if (!selected) {
           new Notice(this.t('externalPickerFallback'));
           return;
@@ -213,17 +186,16 @@ function collectLinks(text: string, offset: number): ExternalMatch[] {
 }
 
 export function getExternalEditorExtension(config: () => ExternalConfig, t: Translate) {
+  const activeViews = new Set<EditorView>();
   class ExternalLinkWidget extends WidgetType {
     constructor(private target: string, private label: string) { super(); }
     eq(other: ExternalLinkWidget): boolean { return this.target === other.target && this.label === other.label; }
     toDOM(): HTMLElement {
-      const el = document.createElement('span');
-      el.className = 'cm-link cm-underline';
-      el.textContent = this.label;
-      el.title = this.target;
+      const el = createSpan({ cls: 'cm-link cm-underline', text: this.label, title: this.target });
       el.setAttribute('role', 'link');
       el.tabIndex = 0;
       const open = (event: Event) => {
+        if (!config().externalEnabled) return;
         event.preventDefault();
         event.stopPropagation();
         void openExternalTarget(this.target, config().externalOpenMode, t);
@@ -247,22 +219,31 @@ export function getExternalEditorExtension(config: () => ExternalConfig, t: Tran
     }
     return Decoration.set(decorations, true);
   };
-  return ViewPlugin.fromClass(class {
+  const extension = ViewPlugin.fromClass(class {
     decorations: DecorationSet;
-    constructor(view: EditorView) { this.decorations = build(view); }
+    private view: EditorView;
+    constructor(view: EditorView) { this.view = view; activeViews.add(view); this.decorations = build(view); }
     update(update: ViewUpdate): void {
       if (update.docChanged || update.selectionSet || update.viewportChanged) {
         this.decorations = build(update.view);
       }
     }
+    destroy(): void { activeViews.delete(this.view); }
   }, { decorations: instance => instance.decorations });
+  return {
+    extension,
+    refresh: () => {
+      for (const view of activeViews) view.dispatch({ selection: view.state.selection });
+    }
+  };
 }
 
 /** Intercepts only clearly identified external links; internal vault links are untouched. */
 export function handleExternalAnchorClick(event: MouseEvent, config: ExternalConfig, t: Translate): boolean {
-  if (!config.externalEnabled) return false;
+  if (!config.externalEnabled || event.defaultPrevented || event.button !== 0) return false;
   const element = event.target;
   if (!(element instanceof Element)) return false;
+  if (!element.closest('.markdown-preview-view')) return false;
   const anchor = element.closest('a');
   if (!anchor) return false;
   const link = anchor.getAttribute('data-href') || anchor.getAttribute('href') || '';

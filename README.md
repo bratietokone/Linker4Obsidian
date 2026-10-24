@@ -4,7 +4,7 @@
 
 A desktop [Obsidian](https://obsidian.md/) community plugin that automatically embeds supported attachments while keeping Markdown notes as ordinary Wiki-links. It can also turn standalone YouTube video URLs into embedded players.
 
-**Version:** 0.5.1 · **Status:** GitHub Release / manual installation · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux). The plugin is not yet listed in the Community Plugins directory.
+**Version:** 0.5.1 · **Status:** Available in Obsidian Community Plugins · **Requirements:** Obsidian 1.8.7 or newer (desktop: Windows, macOS, Linux).
 
 ## Features
 
@@ -23,13 +23,23 @@ A desktop [Obsidian](https://obsidian.md/) community plugin that automatically e
 
 ## Installation (Windows, macOS, Linux)
 
-> Before a first installation or any bulk conversion, make a backup of your vault or test the plugin in a separate vault.
+> Back up your vault before bulk conversion or when trying an unreleased build.
 
-The installation process is the same on every supported desktop operating system. **This version requires manual installation**, because it has not been accepted into the official Obsidian directory.
+### Install from Obsidian (recommended)
 
-1. Open [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Download `main.js` and `manifest.json` from the **Assets** section of the chosen release. Older releases (including 0.5.0) also provide an optional ZIP archive.
-2. Open the **vault** you want to use, not Obsidian's application installation directory. Find or create its hidden `.obsidian/plugins/linker/` folder.
-3. Place both files in that folder, preserving their original names. If using the ZIP, it already includes a `linker/` folder, which should sit inside `.obsidian/plugins/`:
+1. In Obsidian open **Settings → Community plugins → Browse**.
+2. Search for **Linker** (by **bratietokone**), or open the [Linker plugin page](https://obsidian.md/plugins?id=linker).
+3. Select **Install**, then **Enable**. Open **Settings → Linker** to choose your link rules and language.
+
+This is the recommended way to install and receive published updates on Windows, macOS, and Linux. **No manual download is needed.**
+
+### Manual installation (advanced use / local testing)
+
+For a specific GitHub release or an unreleased test build:
+
+1. Get the tested `main.js` and `manifest.json` from [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) or from the CI artifact for your development branch. Release **0.5.1 has two individual assets, not an installation ZIP**. Older releases may include ZIPs.
+2. Find the folder of your **Obsidian vault** (not the Obsidian application). Create `.obsidian/plugins/linker/` inside it.
+3. Place `main.js` and `manifest.json` in that folder:
 
    ```text
    YourVault/
@@ -40,8 +50,9 @@ The installation process is the same on every supported desktop operating system
                └── main.js
    ```
 
-4. Restart Obsidian, or reload your community plugins. Open **Settings → Community plugins**. Enable community plugins (if disabled), then enable **Linker**.
-5. Open **Settings → Linker** (usually under Community plugins) to choose your interface language and link rules.
+4. Restart Obsidian or reload community plugins, then enable **Linker** under **Settings → Community plugins**. Open its settings.
+
+Do not install a test build over a production copy without backing up your vault and the plugin's `data.json`. A development artifact must be tested locally before any release decision.
 
 ### Where is the vault's plugin directory?
 
@@ -124,6 +135,7 @@ Requires Node.js and npm. Source files are in `src/`, translations in `src/local
 
 ```bash
 npm ci
+npm run validate
 npm run typecheck
 npm run lint
 npm run build
@@ -132,9 +144,25 @@ npm test
 
 GitHub Actions runs the same checks on pushes and pull requests. The plugin uses TypeScript and Obsidian's editor API; no external runtime packages or network requests are required.
 
-## Publishing a new version
+## Development and release policy
 
-To publish a new version, update `manifest.json` and `package.json` to the same new `X.Y.Z` version, and add the corresponding `## [X.Y.Z]` entry to `CHANGELOG.md`. Commit the source and version metadata to `main` together; GitHub Actions builds `main.js` automatically and attaches it to the release. Do not commit the generated file. The [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) workflow automatically validates, builds, tests and publishes the GitHub Release with the tag `X.Y.Z` (without `v`). If any check fails, publication is blocked. Do not create the tag or publish a draft manually. To retry a failed release after fixing the cause, use **Run workflow** on `main`. Already published versions are not overwritten.
+**Release 0.5.1 is the current stable version.** Proposed work is not released merely because it appears in the roadmap.
+
+1. **Discuss each development stage in detail before implementation.** Agree on scope, risks, acceptance criteria, and regression scenarios.
+2. Develop on a **separate Git branch / pull request**, preserving the stable release. Run `npm ci`, `npm run validate`, `npm run typecheck`, `npm run lint`, `npm run build`, and `npm test`. GitHub CI also checks reproducible builds and provides an installable test artifact.
+3. The maintainer tests the artifact and, where relevant, the local source build **in desktop Obsidian on their own system**, including regression tests for links, attachments, YouTube, and settings. Address any findings before proceeding.
+4. **Only after a separate explicit release decision** update `manifest.json` and `package.json` to the approved `X.Y.Z` version, and add release notes to the relevant CHANGELOG files. Merging a version change into `main` triggers automatic publication, so never change the manifest version as part of an unapproved test.
+5. The [Publish Linker release workflow](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) validates, builds, tests, attests and publishes GitHub Release `X.Y.Z` (without `v`) with `main.js` and `manifest.json`. The generated `main.js` is not committed. A failed release can be retried after fixing its cause; published versions are not overwritten.
+
+**Do not publish directly from a test branch, automatically advance stages, or release solely on the basis of a passing CI run.** Local validation and a release decision are required.
+
+## Proposed work (not available in 0.5.1)
+
+- **Compatibility and code hygiene:** address the remaining [Obsidian Community review warnings (Issue #9)](https://github.com/bratietokone/Linker4Obsidian/issues/9), with emphasis on external-path safety and support for Obsidian 1.8.7+.
+- **Attachment audit:** discuss a separate module for scanning vault attachments, reporting possibly unused files, previewing evidence and allowing exclusions. Initial design is **read-only**; it does not delete anything.
+- **Optional cleanup later:** only after its own design review and local tests, consider explicitly selected moves to trash. No automatic or permanent deletion is planned.
+
+These are proposals, **not existing features or committed release dates**.
 
 ## Feedback and license
 

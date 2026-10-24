@@ -99,7 +99,7 @@ const t = (key, params={}) => key + (params.path || '');
   const controller = __test.getExternalEditorExtension(() => config, t);
   let dispatchCount = 0;
   const view = { state:{doc:{sliceString:(from,to)=>markdown.slice(from,to)},
-    selection:{main:{head:markdown.length}, ranges:[]}}, visibleRanges:[{from:0,to:markdown.length}],
+    selection:{main:{head:0}, ranges:[]}}, visibleRanges:[{from:0,to:markdown.length}],
     dispatch(spec){ dispatchCount++; this.instance.update({view:this, selectionSet:true, docChanged:false, viewportChanged:false}); }};
   view.instance = new externalWidgetClass(view);
   assert.equal(view.instance.decorations.length, 2);

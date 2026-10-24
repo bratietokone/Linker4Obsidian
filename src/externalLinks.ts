@@ -185,6 +185,72 @@ function collectLinks(text: string, offset: number): ExternalMatch[] {
     index === 0 || match.from >= arr[index - 1].to);
 }
 
+/** Identify external links only in rendered prose, not code or comments. */
+export function collectRenderableExternalLinks(text: string): ExternalMatch[] {
+  const result: ExternalMatch[] = [];
+  const lines = text.match(/[^\n]*\n|[^\n]+$/g) || [];
+  let offset = 0;
+  let frontmatter = false;
+  let fence: { char: string; width: number } | null = null;
+  let comment = false;
+  for (let n = 0; n < lines.length; n++) {
+    const line = lines[n].replace(/\r?\n$/, '');
+    const trimmed = line.trim();
+    if (n === 0 && (trimmed === '---' || trimmed === '+++')) {
+      frontmatter = true;
+      offset += lines[n].length;
+      continue;
+    }
+    if (frontmatter) {
+      if (trimmed === '---' || trimmed === '+++' || trimmed === '...') frontmatter = false;
+      offset += lines[n].length;
+      continue;
+    }
+    const marker = /^ {0,3}(`{3,}|~{3,})/.exec(line);
+    if (fence) {
+      if (marker && marker[1][0] === fence.char && marker[1].length >= fence.width &&
+          line.slice(marker[0].length).trim() === '') fence = null;
+      offset += lines[n].length;
+      continue;
+    }
+    if (marker) {
+      fence = { char: marker[1][0], width: marker[1].length };
+      offset += lines[n].length;
+      continue;
+    }
+    let masked = '', inlineTicks = 0;
+    for (let i = 0; i < line.length;) {
+      if (comment) {
+        const end = line.indexOf('-->', i);
+        if (end === -1) { masked += ' '.repeat(line.length - i); break; }
+        masked += ' '.repeat(end + 3 - i);
+        i = end + 3;
+        comment = false;
+        continue;
+      }
+      if (!inlineTicks && line.startsWith('<!--', i)) {
+        comment = true;
+        continue;
+      }
+      if (line[i] === '`') {
+        let end = i + 1;
+        while (line[end] === '`') end++;
+        const count = end - i;
+        if (!inlineTicks) inlineTicks = count;
+        else if (inlineTicks === count) inlineTicks = 0;
+        masked += ' '.repeat(count);
+        i = end;
+        continue;
+      }
+      masked += inlineTicks ? ' ' : line[i];
+      i++;
+    }
+    result.push(...collectLinks(masked, offset));
+    offset += lines[n].length;
+  }
+  return result;
+}
+
 export function getExternalEditorExtension(config: () => ExternalConfig, t: Translate) {
   const activeViews = new Set<EditorView>();
   class ExternalLinkWidget extends WidgetType {
@@ -209,13 +275,14 @@ export function getExternalEditorExtension(config: () => ExternalConfig, t: Tran
     if (!config().externalEnabled) return Decoration.none;
     const decorations: Range<Decoration>[] = [];
     const cursor = view.state.selection.main.head;
-    for (const range of view.visibleRanges) {
-      const matches = collectLinks(view.state.doc.sliceString(range.from, range.to), range.from);
-      for (const link of matches) {
-        // Keep the full markup editable while the cursor is inside the link.
-        if (cursor >= link.from - 1 && cursor <= link.to + 1) continue;
-        decorations.push(Decoration.replace({ widget: new ExternalLinkWidget(link.target, link.label) }).range(link.from, link.to));
-      }
+    const limit = Math.max(0, ...view.visibleRanges.map(range => range.to));
+    for (const link of collectRenderableExternalLinks(view.state.doc.sliceString(0, limit))) {
+      if (!view.visibleRanges.some(range => link.from >= range.from && link.to <= range.to)) continue;
+      // Keep raw Markdown editable while the cursor is within or near the link.
+      if (cursor >= link.from - 1 && cursor <= link.to + 1) continue;
+      decorations.push(Decoration.replace({
+        widget: new ExternalLinkWidget(link.target, link.label)
+      }).range(link.from, link.to));
     }
     return Decoration.set(decorations, true);
   };
@@ -255,4 +322,4 @@ export function handleExternalAnchorClick(event: MouseEvent, config: ExternalCon
   return true;
 }
 
-export const __externalTest = { collectLinks, chooseNativePath };
+export const __externalTest = { collectLinks, pickLocalPath, collectRenderableExternalLinks };

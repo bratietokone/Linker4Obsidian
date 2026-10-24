@@ -4,8 +4,9 @@ import {
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki,
-  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget,
+  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget, collectRenderableExternalLinks,
   type ExternalFormat, type ExternalOpenMode } from './externalLinks';
+import { pickLocalPath } from './externalPlatform';
 import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
 type Behavior = 'link' | 'embed';
@@ -258,6 +259,7 @@ class ConfirmModal extends Modal {
 export default class LinkerPlugin extends Plugin {
   settings: LinkerSettings = DEFAULT_SETTINGS;
   private applying = new WeakSet<EditorView>();
+  private refreshExternalLinks: () => void = () => {};
 
   private openEditor(file: TFile): Editor | null {
     for (const leaf of this.app.workspace.getLeavesOfType('markdown')) {
@@ -273,7 +275,9 @@ export default class LinkerPlugin extends Plugin {
     this.addSettingTab(new LinkerSettingTab(this.app, this));
     const externalTranslate = (key: string, params: Record<string, string | number> = {}) =>
       tr(this.settings, key as TranslationKey, params);
-    this.registerEditorExtension(getExternalEditorExtension(() => this.settings, externalTranslate));
+    const externalLinks = getExternalEditorExtension(() => this.settings, externalTranslate);
+    this.registerEditorExtension(externalLinks.extension);
+    this.refreshExternalLinks = externalLinks.refresh;
     if (typeof document !== 'undefined') {
       this.registerDomEvent(document, 'click', (event: MouseEvent) =>
         handleExternalAnchorClick(event, this.settings, externalTranslate), true);
@@ -435,6 +439,7 @@ export default class LinkerPlugin extends Plugin {
       }
     });
   }
+  refreshExternalLinkViews(): void { this.refreshExternalLinks(); }
   async saveSettings(): Promise<void> { await this.saveData(this.settings); }
 }
 
@@ -461,6 +466,7 @@ class LinkerSettingTab extends PluginSettingTab {
       new Setting(containerEl).setName(t('externalEnabled')).setDesc(t('externalEnabledDesc'))
         .addToggle(toggle => toggle.setValue(this.plugin.settings.externalEnabled).onChange(async value => {
           this.plugin.settings.externalEnabled = value;
+          this.plugin.refreshExternalLinkViews();
           await this.plugin.saveSettings();
         }));
       new Setting(containerEl).setName(t('externalFormat')).setDesc(t('externalFormatDesc'))
@@ -525,14 +531,14 @@ class LinkerSettingTab extends PluginSettingTab {
     }
     new Setting(containerEl).setName(t('extraExtensions')).setHeading();
     new Setting(containerEl).setName(t('alwaysEmbed')).setDesc(t('alwaysEmbedDesc'))
-      .addText(field => field.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
+      .addText(field => field.setPlaceholder('Epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
         .onChange(async value => { this.plugin.settings.additionalEmbedExtensions = value; await this.plugin.saveSettings(); }));
     new Setting(containerEl).setName(t('alwaysLink')).setDesc(t('alwaysLinkDesc'))
-      .addText(field => field.setPlaceholder('zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
+      .addText(field => field.setPlaceholder('Zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
         .onChange(async value => { this.plugin.settings.additionalLinkExtensions = value; await this.plugin.saveSettings(); }));
     containerEl.createEl('p', { text: t('existingLinksHint') });
   }
 }
 
 /** Pure helpers exposed for automated regression tests. */
-export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget };
+export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget, collectRenderableExternalLinks, getExternalEditorExtension, handleExternalAnchorClick, pickLocalPath };

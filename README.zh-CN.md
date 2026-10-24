@@ -4,7 +4,7 @@
 
 Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。它让 Markdown 笔记保持为普通 Wiki 链接，同时根据规则自动嵌入受支持的附件；还可以将单独的 YouTube 视频网址转换为嵌入式播放器。
 
-**版本：** 0.5.1 · **发布方式：** GitHub Releases（手动安装）· **要求：** Windows、macOS 或 Linux 上的 Obsidian 1.8.7 及以上版本。目前尚未上架官方社区插件目录。
+**版本：** 0.5.1 · **状态：** 已收录于 Obsidian 社区插件目录 · **要求：** Windows、macOS、Linux 桌面版 Obsidian 1.8.7 或更新版本。
 
 ## 功能
 
@@ -23,11 +23,23 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
 
 ## 安装（Windows、macOS 和 Linux）
 
-> 初次使用或批量转换之前，请备份笔记库，或先在测试库中试用。
+> 批量转换链接或测试开发版本之前，请先备份笔记库。
 
-1. 打开 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases)。在所选版本的 **Assets** 中下载 `main.js` 和 `manifest.json`。旧版本（包括 0.5.0）还提供可选的 ZIP 压缩包。
-2. 找到 **Obsidian 笔记库目录**（不是应用安装目录）。在库中创建或打开 `.obsidian/plugins/linker/`。
-3. 将 `main.js` 和 `manifest.json` 放入其中。ZIP 已包含 `linker/` 目录，应直接解压到 `.obsidian/plugins/`。
+### 在 Obsidian 中安装（推荐）
+
+1. 打开 **设置 → 第三方插件（Community plugins）→ 浏览（Browse）**。
+2. 搜索 **Linker**（作者：**bratietokone**），或访问 [Linker 插件页面](https://obsidian.md/plugins?id=linker)。
+3. 点击 **安装**，然后 **启用**。在 **设置 → Linker** 中选择界面语言和链接规则。
+
+此方式适用于 Windows、macOS、Linux，并可通过社区插件机制接收正式更新。**正常安装不需要手动下载文件。**
+
+### 手动安装（高级用法与本地测试）
+
+要测试指定 GitHub 版本或开发分支构建：
+
+1. 从 [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) 或对应分支的 CI 构建产物获取 `main.js` 和 `manifest.json`。**0.5.1 仅提供两个独立文件，不提供 ZIP 安装包**；部分旧版本提供 ZIP。
+2. 找到 **Obsidian 笔记库目录**（不是应用安装目录），在其中创建 `.obsidian/plugins/linker/`。
+3. 将两个文件放入对应目录：
 
    ```text
    YourVault/
@@ -38,8 +50,9 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
                └── manifest.json
    ```
 
-4. 重启 Obsidian 或重新加载社区插件。在 **设置 → 第三方插件（Community plugins）** 中启用 **Linker**。
-5. 打开插件设置，选择语言和链接规则。
+4. 重启 Obsidian 或重新加载社区插件，并启用 **Linker**。
+
+使用开发构建替换稳定版之前，请先备份笔记库和 `data.json`。正式发布需要通过本地测试。
 
 ### 显示隐藏文件夹
 
@@ -113,6 +126,7 @@ Linker 是适用于桌面版 [Obsidian](https://obsidian.md/) 的社区插件。
 
 ```bash
 npm ci
+npm run validate
 npm run typecheck
 npm run lint
 npm run build
@@ -121,9 +135,25 @@ npm test
 
 GitHub Actions 会执行相同的检查。
 
-## 发布新版本
+## 开发与发布审批流程
 
-将 `manifest.json` 和 `package.json` 中的版本号同时更新为新的 `X.Y.Z`，并在 `CHANGELOG.md` 添加对应的 `## [X.Y.Z]` 章节。将源代码和版本元数据的变更合并到 `main`；GitHub Actions 会自动构建 `main.js` 并将其作为 Release 附件，无需把生成文件提交到 Git。工作流 [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) 会自动验证、构建、运行测试，并使用 `X.Y.Z`（不带 `v` 前缀）标签发布 GitHub Release。任何检查失败都将阻止发布，无需手动创建标签或发布草稿。修复问题后，可在 `main` 分支点击 **Run workflow** 重试。已发布的版本不会被覆盖。
+**当前稳定版本为 0.5.1。** 规划中的功能不代表已经发布。
+
+1. **每个开发阶段开始前均需详细讨论**范围、风险、验收标准及回归测试方案。
+2. 在**独立 Git 分支和 Pull Request** 中开发。执行 `npm ci`、`npm run validate`、`npm run typecheck`、`npm run lint`、`npm run build`、`npm test`。CI 还会检查构建是否可重现，并提供测试安装产物。
+3. 维护者**在自己的电脑上使用桌面版 Obsidian 进行本地测试**，必要时从源码自行构建，并检查链接、附件、YouTube 和设置的回归情况。发现问题先修复后复测。
+4. **只有获得明确的发布批准后**，才将 `manifest.json` 和 `package.json` 更新为商定的 `X.Y.Z` 版本，并同步更新各语言 CHANGELOG。将新版号提交到 `main` 会自动触发发布，因此批准前不得修改版本号。
+5. [Publish Linker release 工作流](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) 会执行校验、构建、测试、构建证明并发布 GitHub Release `X.Y.Z`（不加 `v`），附带 `main.js` 与 `manifest.json`。生成文件不提交 Git；已经发布的版本不会被覆盖。
+
+**CI 成功不等于允许发布。** 测试分支不得直接发布；每个新阶段开始前都需重新讨论。
+
+## 后续设想（0.5.1 尚未实现）
+
+- **兼容性与代码质量：** 处理 [Obsidian Community 审查警告（Issue #9）](https://github.com/bratietokone/Linker4Obsidian/issues/9)，同时保持外部路径安全和 Obsidian 1.8.7+ 兼容性。
+- **附件审计：** 设计独立的扫描和报告模块，识别可能未被引用的附件，提供预览与排除规则。初始版本**只读，不删除文件**。
+- **以后再考虑清理：** 经单独讨论和本地测试后，才考虑将用户明确选择的文件移动到回收站。不计划自动删除或永久删除。
+
+以上仅为建议，**不是已实现的功能或已确定的发布时间表**。
 
 ## 相关链接
 

@@ -4,7 +4,7 @@
 
 Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian.md/). Mantiene los enlaces a notas Markdown como enlaces Wiki normales e incrusta automáticamente los archivos adjuntos compatibles. También convierte URL de vídeos de YouTube en reproductores integrados.
 
-**Versión:** 0.5.1 · **Distribución:** GitHub Releases (instalación manual) · **Requisitos:** Obsidian 1.8.7 o superior, Windows, macOS o Linux. El plugin aún no figura en el catálogo oficial.
+**Versión:** 0.5.1 · **Estado:** disponible en los plugins comunitarios de Obsidian · **Requisitos:** Obsidian 1.8.7 o superior (Windows, macOS y Linux de escritorio).
 
 ## Funciones
 
@@ -23,11 +23,23 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
 
 ## Instalación (Windows, macOS y Linux)
 
-> Antes de realizar conversiones masivas, haz una copia de seguridad de la bóveda o utiliza una bóveda de prueba.
+> Haz una copia de seguridad de tu bóveda antes de convertir enlaces masivamente o probar compilaciones de desarrollo.
 
-1. Abre [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases). Descarga `main.js` y `manifest.json` desde **Assets** de la versión elegida. Las versiones anteriores, incluida la 0.5.0, también tienen un ZIP opcional.
-2. En tu **bóveda de Obsidian** (no en la carpeta de instalación del programa), abre o crea `.obsidian/plugins/linker/`.
-3. Coloca allí `main.js` y `manifest.json`. Si utilizas el ZIP, extrae la carpeta `linker/` dentro de `.obsidian/plugins/`.
+### Desde Obsidian (recomendado)
+
+1. Abre **Configuración → Plugins de la comunidad → Explorar (Browse)**.
+2. Busca **Linker** (autor: **bratietokone**) o abre la [página del plugin](https://obsidian.md/plugins?id=linker).
+3. Pulsa **Instalar** y después **Activar**. Abre **Configuración → Linker** para ajustar idioma y reglas.
+
+Esta es la forma recomendada de instalar y recibir actualizaciones en Windows, macOS y Linux. **No es necesario descargar archivos manualmente.**
+
+### Instalación manual (avanzada y de pruebas)
+
+Para instalar una versión específica de GitHub o una compilación de prueba:
+
+1. Obtén `main.js` y `manifest.json` desde [GitHub Releases](https://github.com/bratietokone/Linker4Obsidian/releases) o desde el artefacto de CI de la rama. La versión **0.5.1 incluye dos archivos separados, no un ZIP**; algunas versiones anteriores sí tienen ZIP.
+2. Abre la **carpeta de la bóveda** (no la instalación de Obsidian) y crea `.obsidian/plugins/linker/`.
+3. Copia ambos archivos sin cambiar sus nombres:
 
    ```text
    TuBoveda/
@@ -38,8 +50,9 @@ Plugin comunitario para la versión de escritorio de [Obsidian](https://obsidian
                └── manifest.json
    ```
 
-4. Reinicia Obsidian (o recarga los plugins de la comunidad), abre **Configuración → Plugins de la comunidad** y activa **Linker**.
-5. Abre la configuración del plugin para seleccionar el idioma y las reglas.
+4. Reinicia Obsidian o recarga los plugins de la comunidad y activa **Linker**.
+
+Antes de sustituir una instalación estable por una versión de prueba, guarda la bóveda y `data.json`. Las publicaciones requieren pruebas locales previas.
 
 ### Mostrar la carpeta oculta
 
@@ -113,6 +126,7 @@ Requiere Node.js y npm. El código TypeScript está en `src/`, las traducciones 
 
 ```bash
 npm ci
+npm run validate
 npm run typecheck
 npm run lint
 npm run build
@@ -121,9 +135,25 @@ npm test
 
 GitHub Actions ejecuta las mismas comprobaciones.
 
-## Publicar una versión nueva
+## Desarrollo y aprobación de versiones
 
-Actualiza `manifest.json` y `package.json` a la misma versión nueva `X.Y.Z` y añade la sección `## [X.Y.Z]` a `CHANGELOG.md`. Integra los cambios del código fuente y la versión en `main`. GitHub Actions compila `main.js` y lo adjunta a la versión; no debes incluir el archivo generado en Git. El flujo [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) valida, compila, ejecuta las pruebas y publica automáticamente la versión de GitHub con la etiqueta `X.Y.Z` (sin `v`). Si falla alguna comprobación, no publica nada. No es necesario crear etiquetas ni publicar borradores manualmente. Puedes reintentarlo con **Run workflow** en `main`. Las versiones publicadas no se sobrescriben.
+**La versión estable actual es 0.5.1.** Las funciones previstas no se consideran publicadas.
+
+1. **Debatir detalladamente cada etapa antes de implementarla:** alcance, riesgos, criterios de aceptación y posibles regresiones.
+2. Desarrollar en **una rama y solicitud de cambios independientes**. Ejecutar `npm ci`, `npm run validate`, `npm run typecheck`, `npm run lint`, `npm run build` y `npm test`. CI comprueba también que la compilación sea reproducible y proporciona un artefacto de prueba.
+3. El responsable prueba **localmente en Obsidian de escritorio** el artefacto y, cuando corresponda, compila desde el código fuente. Comprueba enlaces, adjuntos, YouTube y ajustes. Las incidencias se corrigen antes de continuar.
+4. **Solo después de aprobar expresamente la publicación**, actualizar `manifest.json` y `package.json` a la versión `X.Y.Z` acordada y añadir el CHANGELOG traducido. Un cambio de versión del manifiesto en `main` desencadena la publicación automáticamente: no se modifica antes de la aprobación.
+5. El workflow [Publish Linker release](https://github.com/bratietokone/Linker4Obsidian/actions/workflows/release.yml) valida, compila, prueba, acredita y publica GitHub Release `X.Y.Z` (sin `v`) con `main.js` y `manifest.json`. El archivo generado no se confirma en Git. No se sobrescriben versiones ya publicadas.
+
+**Pasar CI no constituye una autorización para publicar.** No se publican ramas de prueba ni se comienza otra etapa sin la conversación correspondiente.
+
+## Propuestas (aún no disponibles en 0.5.1)
+
+- **Correcciones y compatibilidad:** revisar las [advertencias de Obsidian Community (Issue #9)](https://github.com/bratietokone/Linker4Obsidian/issues/9), especialmente la seguridad de las rutas externas y Obsidian 1.8.7+.
+- **Auditoría de adjuntos:** analizar archivos de la bóveda, mostrar posibles adjuntos sin referencias, ofrecer vista previa, informes y exclusiones. El primer paso será **solo lectura**.
+- **Limpieza opcional:** en una fase futura, después de discusión y pruebas locales, considerar mover a la papelera únicamente los archivos seleccionados expresamente. No se prevé borrado automático ni permanente.
+
+Son propuestas y **no funciones existentes ni fechas de lanzamiento**.
 
 ## Enlaces
 

@@ -147,7 +147,7 @@ const app = {
   // the nested "automatic on paste and typing" preference.
   const url = 'https://youtu.be/dQw4w9WgXcQ';
   const expectedEmbed = '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)';
-  async function simulateEditorTyping(text) {
+  async function simulateEditorTyping(text, inserted = text, start = 0, end = text.length) {
     const doc = {
       length: text.length,
       toString: () => text,
@@ -156,13 +156,17 @@ const app = {
     let patch = null;
     const view = { hasFocus: true, state: {doc}, dispatch: transaction => { patch = transaction.changes; } };
     updateCallback({docChanged:true, view, state:{doc}, changes:{
-      iterChanges(callback) { callback(0, 0, 0, text.length, {toString:() => text}); }
+      iterChanges(callback) { callback(0, 0, start, end, {toString:() => inserted}); }
     }});
     await Promise.resolve();
     return patch ? text.slice(0, patch.from) + patch.insert + text.slice(patch.to) : text;
   }
 
   assert.equal(await simulateEditorTyping(url), expectedEmbed);
+  // Entering characters one by one must not rewrite a URL prematurely.
+  assert.equal(await simulateEditorTyping(url, 'Q', url.length - 1, url.length), url);
+  // Once the user finishes typing with whitespace, auto conversion may run.
+  assert.equal(await simulateEditorTyping(url + ' ', ' ', url.length, url.length + 1), expectedEmbed + ' ');
   plugin.settings.pasteYouTube = false;
   assert.equal(await simulateEditorTyping(url), url);
   // Automatic Wiki attachment rules must continue to work independently.

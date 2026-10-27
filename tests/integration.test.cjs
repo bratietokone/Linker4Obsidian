@@ -89,7 +89,13 @@ const app = {
   // clearing the previously saved automatic preference.
   settingTab.display();
   const youtubeMaster = renderedSettings.find(setting => setting.name === 'Включить поддержку YouTube')?.control;
-  const youtubeAuto = renderedSettings.find(setting => setting.name === '↳ Автоматически встраивать при вставке и вводе')?.control;
+  const youtubeHeadingIndex = renderedSettings.findIndex(setting => setting.name === 'YouTube');
+  const youtubeMasterIndex = renderedSettings.findIndex(setting => setting.name === 'Включить поддержку YouTube');
+  const youtubeAutomaticIndex = renderedSettings.findIndex(setting => setting.name === 'Автоматически встраивать при вставке и вводе');
+  assert.ok(youtubeHeadingIndex >= 0 && youtubeHeadingIndex < youtubeMasterIndex);
+  assert.ok(youtubeMasterIndex < youtubeAutomaticIndex);
+  assert.ok(!renderedSettings.some(setting => setting.name?.includes('↳')));
+  const youtubeAuto = renderedSettings[youtubeAutomaticIndex]?.control;
   assert.ok(youtubeMaster && youtubeAuto);
   assert.equal(youtubeAuto.disabled, false);
   await youtubeMaster.change(false);

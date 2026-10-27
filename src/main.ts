@@ -512,8 +512,10 @@ class LinkerSettingTab extends PluginSettingTab {
         this.plugin.settings.automaticWiki = value;
         await this.plugin.saveSettings();
       }));
-    // Keep the automatic switch subordinate without resetting it when
-    // the master switch is turned off. Update disabled state in place.
+    // Group the two related options using native Obsidian settings,
+    // without decorative text prefixes or custom styling.
+    new Setting(containerEl).setName('YouTube').setHeading();
+    // Keep the automatic switch dependent without resetting its saved value.
     let setAutomaticYouTubeDisabled: (disabled: boolean) => void = () => {};
     new Setting(containerEl).setName(t('automaticYouTube')).setDesc(t('automaticYouTubeDesc'))
       .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticYouTube).onChange(async value => {
@@ -522,7 +524,7 @@ class LinkerSettingTab extends PluginSettingTab {
         await this.plugin.saveSettings();
       }));
     new Setting(containerEl)
-      .setName('↳ ' + t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
+      .setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
       .addToggle(toggle => {
         setAutomaticYouTubeDisabled = disabled => { toggle.setDisabled(disabled); };
         toggle.setValue(this.plugin.settings.pasteYouTube)

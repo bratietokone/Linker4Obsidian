@@ -7,6 +7,6 @@ esbuild.buildSync({
   platform: 'node',
   format: 'cjs',
   target: 'es2021',
-  external: ['obsidian', '@codemirror/view'],
+  external: ['obsidian', '@codemirror/view', 'electron', '@electron/remote'],
   logLevel: 'info'
 });

@@ -4,8 +4,9 @@ import {
 } from 'obsidian';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki,
-  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget,
+  getExternalEditorExtension, handleExternalAnchorClick, ExternalInsertModal, openExternalTarget, collectRenderableExternalLinks,
   type ExternalFormat, type ExternalOpenMode } from './externalLinks';
+import { pickLocalPath } from './externalPlatform';
 import { TRANSLATIONS, localeFromLanguage, type TranslationKey, type UiLocale, type LanguagePreference } from './locales';
 
 type Behavior = 'link' | 'embed';
@@ -32,6 +33,8 @@ const DEFAULT_SETTINGS: LinkerSettings = {
   externalOpenMode: 'open',
   automaticWiki: true,
   automaticYouTube: true,
+  // Keep existing data.json keys: automaticYouTube = master switch,
+  // pasteYouTube = automatic handling (paste and typing).
   pasteYouTube: true,
   rules: { markdown: 'link', image: 'embed', pdf: 'embed', video: 'embed', audio: 'embed', other: 'link' },
   additionalEmbedExtensions: '',
@@ -258,6 +261,7 @@ class ConfirmModal extends Modal {
 export default class LinkerPlugin extends Plugin {
   settings: LinkerSettings = DEFAULT_SETTINGS;
   private applying = new WeakSet<EditorView>();
+  private refreshExternalLinks: () => void = () => {};
 
   private openEditor(file: TFile): Editor | null {
     for (const leaf of this.app.workspace.getLeavesOfType('markdown')) {
@@ -273,7 +277,9 @@ export default class LinkerPlugin extends Plugin {
     this.addSettingTab(new LinkerSettingTab(this.app, this));
     const externalTranslate = (key: string, params: Record<string, string | number> = {}) =>
       tr(this.settings, key as TranslationKey, params);
-    this.registerEditorExtension(getExternalEditorExtension(() => this.settings, externalTranslate));
+    const externalLinks = getExternalEditorExtension(() => this.settings, externalTranslate);
+    this.registerEditorExtension(externalLinks.extension);
+    this.refreshExternalLinks = externalLinks.refresh;
     if (typeof document !== 'undefined') {
       this.registerDomEvent(document, 'click', (event: MouseEvent) =>
         handleExternalAnchorClick(event, this.settings, externalTranslate), true);
@@ -299,7 +305,8 @@ export default class LinkerPlugin extends Plugin {
     });
 
     this.registerEditorExtension(EditorView.updateListener.of((update: ViewUpdate) => {
-      if (!update.docChanged || !(this.settings.automaticWiki || this.settings.automaticYouTube) ||
+      const autoYouTube = this.settings.automaticYouTube && this.settings.pasteYouTube;
+      if (!update.docChanged || !(this.settings.automaticWiki || autoYouTube) ||
         this.applying.has(update.view) || !update.view.hasFocus) return;
       const file = this.app.workspace.getActiveFile();
       if (!file || file.extension !== 'md') return;
@@ -309,7 +316,14 @@ export default class LinkerPlugin extends Plugin {
         const insertedText = inserted.toString();
         const changedLine = update.state.doc.lineAt(Math.min(fromB, update.state.doc.length)).text;
         const wikiNearby = this.settings.automaticWiki && changedLine.includes('[[') && changedLine.includes(']]');
-        if (insertedText.length && (wikiNearby || /https?:\/\//.test(insertedText) || insertedText.includes(']('))) {
+        // React to pasted URLs and links, and also to a delimiter that
+        // finishes typing a URL. Do not rewrite an unfinished URL mid-entry.
+        const completedByDelimiter = /\s/.test(insertedText) &&
+          (/https?:\/\//.test(changedLine) ||
+           /https?:\/\//.test(update.state.doc.lineAt(Math.max(0, fromB - 1)).text));
+        const youtubeNearby = autoYouTube &&
+          (/https?:\/\//.test(insertedText) || insertedText.includes('](') || completedByDelimiter);
+        if (insertedText.length && (wikiNearby || youtubeNearby)) {
           ranges.push({ from: fromB, to: toB });
           promising = true;
         }
@@ -325,16 +339,22 @@ export default class LinkerPlugin extends Plugin {
         // Convert only links intersecting text just entered, not old links on
         // the same line or elsewhere in the note.
         let output = input;
+        // The master switch allows manual Ctrl+P conversion. This derived
+        // configuration disables only *automatic* editor transformations.
+        const autoSettings: LinkerSettings = {
+          ...this.settings,
+          automaticYouTube: this.settings.automaticYouTube && this.settings.pasteYouTube
+        };
         // Work from the end: offsets stay stable until all replacements are done.
         for (const range of ranges.sort((a, b) => b.from - a.from)) {
           // Replacements can alter offsets. One range per transaction is the
           // normal case; for multi-line paste use the envelope instead below.
           if (ranges.length > 1) break;
-          output = transformText(output, file.path, this.app, this.settings, range).text;
+          output = transformText(output, file.path, this.app, autoSettings, range).text;
         }
         if (ranges.length > 1) {
           const envelope = { from: Math.min(...ranges.map(r => r.from)), to: Math.max(...ranges.map(r => r.to)) };
-          output = transformText(input, file.path, this.app, this.settings, envelope).text;
+          output = transformText(input, file.path, this.app, autoSettings, envelope).text;
         }
         if (output === input) return;
         // Minimal change set preserves cursor/selection mapping and undo history.
@@ -435,6 +455,7 @@ export default class LinkerPlugin extends Plugin {
       }
     });
   }
+  refreshExternalLinkViews(): void { this.refreshExternalLinks(); }
   async saveSettings(): Promise<void> { await this.saveData(this.settings); }
 }
 
@@ -461,6 +482,7 @@ class LinkerSettingTab extends PluginSettingTab {
       new Setting(containerEl).setName(t('externalEnabled')).setDesc(t('externalEnabledDesc'))
         .addToggle(toggle => toggle.setValue(this.plugin.settings.externalEnabled).onChange(async value => {
           this.plugin.settings.externalEnabled = value;
+          this.plugin.refreshExternalLinkViews();
           await this.plugin.saveSettings();
         }));
       new Setting(containerEl).setName(t('externalFormat')).setDesc(t('externalFormatDesc'))
@@ -496,16 +518,28 @@ class LinkerSettingTab extends PluginSettingTab {
         this.plugin.settings.automaticWiki = value;
         await this.plugin.saveSettings();
       }));
+    // Group the two related options using native Obsidian settings,
+    // without decorative text prefixes or custom styling.
+    new Setting(containerEl).setName('YouTube').setHeading();
+    // Keep the automatic switch dependent without resetting its saved value.
+    let setAutomaticYouTubeDisabled: (disabled: boolean) => void = () => {};
     new Setting(containerEl).setName(t('automaticYouTube')).setDesc(t('automaticYouTubeDesc'))
       .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticYouTube).onChange(async value => {
         this.plugin.settings.automaticYouTube = value;
+        setAutomaticYouTubeDisabled(!value);
         await this.plugin.saveSettings();
       }));
-    new Setting(containerEl).setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
-      .addToggle(toggle => toggle.setValue(this.plugin.settings.pasteYouTube).onChange(async value => {
-        this.plugin.settings.pasteYouTube = value;
-        await this.plugin.saveSettings();
-      }));
+    new Setting(containerEl)
+      .setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
+      .addToggle(toggle => {
+        setAutomaticYouTubeDisabled = disabled => { toggle.setDisabled(disabled); };
+        toggle.setValue(this.plugin.settings.pasteYouTube)
+          .setDisabled(!this.plugin.settings.automaticYouTube)
+          .onChange(async value => {
+            this.plugin.settings.pasteYouTube = value;
+            await this.plugin.saveSettings();
+          });
+      });
     new Setting(containerEl).setName(t('fileRules')).setHeading();
     const labels: { cat: Category; name: TranslationKey; desc: string }[] = [
       { cat: 'markdown', name: 'markdown', desc: '.md, .markdown' },
@@ -525,14 +559,14 @@ class LinkerSettingTab extends PluginSettingTab {
     }
     new Setting(containerEl).setName(t('extraExtensions')).setHeading();
     new Setting(containerEl).setName(t('alwaysEmbed')).setDesc(t('alwaysEmbedDesc'))
-      .addText(field => field.setPlaceholder('epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
+      .addText(field => field.setPlaceholder('Epub, tif').setValue(this.plugin.settings.additionalEmbedExtensions)
         .onChange(async value => { this.plugin.settings.additionalEmbedExtensions = value; await this.plugin.saveSettings(); }));
     new Setting(containerEl).setName(t('alwaysLink')).setDesc(t('alwaysLinkDesc'))
-      .addText(field => field.setPlaceholder('zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
+      .addText(field => field.setPlaceholder('Zip, exe').setValue(this.plugin.settings.additionalLinkExtensions)
         .onChange(async value => { this.plugin.settings.additionalLinkExtensions = value; await this.plugin.saveSettings(); }));
     containerEl.createEl('p', { text: t('existingLinksHint') });
   }
 }
 
 /** Pure helpers exposed for automated regression tests. */
-export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget };
+export const __test = { transformText, youtubeEmbed, inInlineCode, resolvedLocale, localeFromLanguage, tr, createExternalLink, resolveExternalTarget, isExecutablePath, readExternalLinkFromWiki, openExternalTarget, collectRenderableExternalLinks, getExternalEditorExtension, handleExternalAnchorClick, pickLocalPath };

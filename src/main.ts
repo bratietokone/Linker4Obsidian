@@ -32,6 +32,8 @@ const DEFAULT_SETTINGS: LinkerSettings = {
   externalOpenMode: 'open',
   automaticWiki: true,
   automaticYouTube: true,
+  // Keep existing data.json keys: automaticYouTube = master switch,
+  // pasteYouTube = automatic handling (paste and typing).
   pasteYouTube: true,
   rules: { markdown: 'link', image: 'embed', pdf: 'embed', video: 'embed', audio: 'embed', other: 'link' },
   additionalEmbedExtensions: '',
@@ -299,7 +301,8 @@ export default class LinkerPlugin extends Plugin {
     });
 
     this.registerEditorExtension(EditorView.updateListener.of((update: ViewUpdate) => {
-      if (!update.docChanged || !(this.settings.automaticWiki || this.settings.automaticYouTube) ||
+      const autoYouTube = this.settings.automaticYouTube && this.settings.pasteYouTube;
+      if (!update.docChanged || !(this.settings.automaticWiki || autoYouTube) ||
         this.applying.has(update.view) || !update.view.hasFocus) return;
       const file = this.app.workspace.getActiveFile();
       if (!file || file.extension !== 'md') return;
@@ -309,7 +312,9 @@ export default class LinkerPlugin extends Plugin {
         const insertedText = inserted.toString();
         const changedLine = update.state.doc.lineAt(Math.min(fromB, update.state.doc.length)).text;
         const wikiNearby = this.settings.automaticWiki && changedLine.includes('[[') && changedLine.includes(']]');
-        if (insertedText.length && (wikiNearby || /https?:\/\//.test(insertedText) || insertedText.includes(']('))) {
+        const youtubeNearby = autoYouTube &&
+          (/https?:\/\//.test(insertedText) || insertedText.includes(']('));
+        if (insertedText.length && (wikiNearby || youtubeNearby)) {
           ranges.push({ from: fromB, to: toB });
           promising = true;
         }
@@ -325,16 +330,22 @@ export default class LinkerPlugin extends Plugin {
         // Convert only links intersecting text just entered, not old links on
         // the same line or elsewhere in the note.
         let output = input;
+        // The master switch allows manual Ctrl+P conversion. This derived
+        // configuration disables only *automatic* editor transformations.
+        const autoSettings: LinkerSettings = {
+          ...this.settings,
+          automaticYouTube: this.settings.automaticYouTube && this.settings.pasteYouTube
+        };
         // Work from the end: offsets stay stable until all replacements are done.
         for (const range of ranges.sort((a, b) => b.from - a.from)) {
           // Replacements can alter offsets. One range per transaction is the
           // normal case; for multi-line paste use the envelope instead below.
           if (ranges.length > 1) break;
-          output = transformText(output, file.path, this.app, this.settings, range).text;
+          output = transformText(output, file.path, this.app, autoSettings, range).text;
         }
         if (ranges.length > 1) {
           const envelope = { from: Math.min(...ranges.map(r => r.from)), to: Math.max(...ranges.map(r => r.to)) };
-          output = transformText(input, file.path, this.app, this.settings, envelope).text;
+          output = transformText(input, file.path, this.app, autoSettings, envelope).text;
         }
         if (output === input) return;
         // Minimal change set preserves cursor/selection mapping and undo history.
@@ -500,12 +511,19 @@ class LinkerSettingTab extends PluginSettingTab {
       .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticYouTube).onChange(async value => {
         this.plugin.settings.automaticYouTube = value;
         await this.plugin.saveSettings();
+        // Update availability of the nested automatic-processing switch.
+        this.display();
       }));
-    new Setting(containerEl).setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
-      .addToggle(toggle => toggle.setValue(this.plugin.settings.pasteYouTube).onChange(async value => {
-        this.plugin.settings.pasteYouTube = value;
-        await this.plugin.saveSettings();
-      }));
+    const automaticYouTubeSetting = new Setting(containerEl)
+      .setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
+      .addToggle(toggle => toggle
+        .setValue(this.plugin.settings.pasteYouTube)
+        .setDisabled(!this.plugin.settings.automaticYouTube)
+        .onChange(async value => {
+          this.plugin.settings.pasteYouTube = value;
+          await this.plugin.saveSettings();
+        }));
+    automaticYouTubeSetting.settingEl.style.paddingInlineStart = '1.5rem';
     new Setting(containerEl).setName(t('fileRules')).setHeading();
     const labels: { cat: Category; name: TranslationKey; desc: string }[] = [
       { cat: 'markdown', name: 'markdown', desc: '.md, .markdown' },

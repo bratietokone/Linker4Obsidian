@@ -120,6 +120,8 @@ Click links in Reading View or Live Preview to open a file in its default OS app
 
 The plugin preserves deliberate existing `![[...]]` embeds and does not rewrite fenced code blocks, YAML frontmatter, inline code, or HTML-comment lines. Bulk conversion changes existing notes only after confirmation. **Back up the vault before batch conversion.**
 
+**YouTube settings:** **Enable YouTube embedding** is the master switch for conversion (including the commands under `Ctrl+P` / `Cmd+P`). Its nested **Automatically embed on paste and typing** switch controls only the editor's immediate automatic conversion. Turn it off to preserve newly pasted or typed YouTube URLs until you explicitly run a preview-and-convert command. Turning off the master switch disables both paths. Existing saved settings are retained.
+
 ## Limitations
 
 - External paths must be absolute, are device-specific, and may be inaccessible in sandboxed installations such as Flatpak.

@@ -112,6 +112,8 @@ Los enlaces se abren en el modo de lectura o Live Preview mediante la aplicació
 
 Las incrustaciones intencionales se conservan. Se omiten bloques de código, código en línea, frontmatter YAML y líneas con comentarios HTML. **Haz una copia de seguridad antes de la conversión masiva.**
 
+**Configuración de YouTube:** **Activar la incrustación de YouTube** permite la conversión, incluidos los comandos de vista previa (`Ctrl+P` / `Cmd+P`). La opción anidada **Incrustar automáticamente al pegar y escribir** solo controla el procesamiento inmediato en el editor. Si se desactiva, los enlaces insertados permanecen intactos hasta usar un comando de conversión. Al desactivar el interruptor principal, se desactivan ambas formas. Se mantienen los ajustes guardados.
+
 ## Limitaciones
 
 - Las rutas externas son absolutas, específicas de cada equipo y pueden estar restringidas en entornos aislados como Flatpak.

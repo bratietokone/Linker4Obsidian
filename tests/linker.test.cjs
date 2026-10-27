@@ -63,6 +63,10 @@ const tests = [
   () => eq('```\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n```', '```\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ\n```'),
   () => eq('[[a.jpg]]', '[[a.jpg]]', {...defaults, automaticWiki: false}),
   () => eq('https://youtu.be/dQw4w9WgXcQ', 'https://youtu.be/dQw4w9WgXcQ', {...defaults, automaticYouTube: false}),
+  // Manual Ctrl+P conversion remains available even when automatic insertion is disabled.
+  () => eq('https://youtu.be/dQw4w9WgXcQ', '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ)', {...defaults, pasteYouTube: false}),
+  () => eq('https://youtu.be/dQw4w9WgXcQ', 'https://youtu.be/dQw4w9WgXcQ', {...defaults, automaticYouTube: false, pasteYouTube: false}),
+  () => assert.equal(__test.tr({...defaults, language: 'ru'}, 'pasteYouTube'), 'Автоматически встраивать при вставке и вводе'),
   () => assert.equal(__test.youtubeEmbed('https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12'), '![](https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=12)'),
   () => assert.equal(__test.youtubeEmbed('https://youtube.com.evil.tld/watch?v=dQw4w9WgXcQ'), null),
   () => assert.equal(__test.youtubeEmbed('javascript:alert(1)'), null),

@@ -312,8 +312,13 @@ export default class LinkerPlugin extends Plugin {
         const insertedText = inserted.toString();
         const changedLine = update.state.doc.lineAt(Math.min(fromB, update.state.doc.length)).text;
         const wikiNearby = this.settings.automaticWiki && changedLine.includes('[[') && changedLine.includes(']]');
+        // React to pasted URLs and links, and also to a delimiter that
+        // finishes typing a URL. Do not rewrite an unfinished URL mid-entry.
+        const completedByDelimiter = /\s/.test(insertedText) &&
+          (/https?:\/\//.test(changedLine) ||
+           /https?:\/\//.test(update.state.doc.lineAt(Math.max(0, fromB - 1)).text));
         const youtubeNearby = autoYouTube &&
-          (/https?:\/\//.test(insertedText) || insertedText.includes(']('));
+          (/https?:\/\//.test(insertedText) || insertedText.includes('](') || completedByDelimiter);
         if (insertedText.length && (wikiNearby || youtubeNearby)) {
           ranges.push({ from: fromB, to: toB });
           promising = true;

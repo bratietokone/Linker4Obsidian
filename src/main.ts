@@ -507,23 +507,26 @@ class LinkerSettingTab extends PluginSettingTab {
         this.plugin.settings.automaticWiki = value;
         await this.plugin.saveSettings();
       }));
+    // Keep the automatic switch subordinate without resetting it when
+    // the master switch is turned off. Update disabled state in place.
+    let setAutomaticYouTubeDisabled: (disabled: boolean) => void = () => {};
     new Setting(containerEl).setName(t('automaticYouTube')).setDesc(t('automaticYouTubeDesc'))
       .addToggle(toggle => toggle.setValue(this.plugin.settings.automaticYouTube).onChange(async value => {
         this.plugin.settings.automaticYouTube = value;
+        setAutomaticYouTubeDisabled(!value);
         await this.plugin.saveSettings();
-        // Update availability of the nested automatic-processing switch.
-        this.display();
       }));
-    const automaticYouTubeSetting = new Setting(containerEl)
-      .setName(t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
-      .addToggle(toggle => toggle
-        .setValue(this.plugin.settings.pasteYouTube)
-        .setDisabled(!this.plugin.settings.automaticYouTube)
-        .onChange(async value => {
-          this.plugin.settings.pasteYouTube = value;
-          await this.plugin.saveSettings();
-        }));
-    automaticYouTubeSetting.settingEl.style.paddingInlineStart = '1.5rem';
+    new Setting(containerEl)
+      .setName('↳ ' + t('pasteYouTube')).setDesc(t('pasteYouTubeDesc'))
+      .addToggle(toggle => {
+        setAutomaticYouTubeDisabled = disabled => { toggle.setDisabled(disabled); };
+        toggle.setValue(this.plugin.settings.pasteYouTube)
+          .setDisabled(!this.plugin.settings.automaticYouTube)
+          .onChange(async value => {
+            this.plugin.settings.pasteYouTube = value;
+            await this.plugin.saveSettings();
+          });
+      });
     new Setting(containerEl).setName(t('fileRules')).setHeading();
     const labels: { cat: Category; name: TranslationKey; desc: string }[] = [
       { cat: 'markdown', name: 'markdown', desc: '.md, .markdown' },
